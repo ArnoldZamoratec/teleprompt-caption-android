@@ -44,6 +44,7 @@ class MigrationTest {
         helper.runMigrationsAndValidate(dbName, 2, true, *Migrations.ALL).use { db ->
             db.execSQL("INSERT INTO takes (id, projectId, filePath, durationMs, width, height, frameRate, createdAt) VALUES ('t1', 'p1', '/x.mp4', 1000, 1080, 1920, 30, 20)")
         }
+        helper.runMigrationsAndValidate(dbName, 3, true, *Migrations.ALL).close()
 
         val database = Room.databaseBuilder(
             InstrumentationRegistry.getInstrumentation().targetContext,
@@ -59,6 +60,34 @@ class MigrationTest {
             }
         } finally {
             database.close()
+        }
+    }
+
+    @Test
+    fun migrate2To3_addsCaptionTracksThatCascadeWithTheTake() {
+        helper.createDatabase(dbName, 2).use { db ->
+            db.execSQL("INSERT INTO scripts (id, title, body, wordCount, updatedAt) VALUES ('s1', 'Demo', 'hola', 1, 10)")
+            db.execSQL(
+                """
+                INSERT INTO projects (id, name, scriptId, rec_lens, rec_orientation, rec_resolution, rec_frameRate,
+                    tp_speed, tp_fontSizeSp, tp_lineSpacing, tp_letterSpacing, tp_horizontalMarginDp, tp_position,
+                    tp_alignment, tp_mirror, tp_backgroundOpacity, tp_countdownSeconds, captionStyleId, createdAt, updatedAt)
+                VALUES ('p1', 'Demo', 's1', 'FRONT', 'PORTRAIT', 'FHD_1080', 30, 1.0, 34.0, 1.5, 0.0, 24, 'TOP',
+                    'CENTER', 0, 0.55, 3, NULL, 10, 10)
+                """.trimIndent(),
+            )
+            db.execSQL("INSERT INTO takes (id, projectId, filePath, durationMs, width, height, frameRate, createdAt) VALUES ('t1', 'p1', '/x.mp4', 1000, 1080, 1920, 30, 20)")
+        }
+
+        helper.runMigrationsAndValidate(dbName, 3, true, *Migrations.ALL).use { db ->
+            db.execSQL("PRAGMA foreign_keys = ON")
+            db.execSQL("INSERT INTO caption_tracks (takeId, styleJson, language, engineId, updatedAt) VALUES ('t1', '{}', 'es-ES', 'x', 30)")
+            db.execSQL("INSERT INTO captions (id, takeId, text, startMs, endMs, wordsJson) VALUES ('c1', 't1', 'hola', 0, 500, '[]')")
+            db.execSQL("DELETE FROM takes WHERE id = 't1'")
+            db.query("SELECT COUNT(*) FROM captions").use { cursor ->
+                cursor.moveToFirst()
+                assertThat(cursor.getInt(0)).isEqualTo(0)
+            }
         }
     }
 }

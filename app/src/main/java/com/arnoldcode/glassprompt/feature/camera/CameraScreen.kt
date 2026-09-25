@@ -246,25 +246,34 @@ private fun CameraContent(state: CameraUiState, viewModel: CameraViewModel) {
             }
         }
 
-        AnimatedVisibility(visible = chromeVisible || !recording, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.fillMaxSize()) {
-            Box(Modifier.fillMaxSize().safeDrawingPadding()) {
-                TopChrome(state, onBack = viewModel::onBackRequest, onTorch = viewModel::onTorchToggle, onSwitch = viewModel::onSwitchLens, modifier = Modifier.align(Alignment.TopCenter))
-                Column(
-                    Modifier.align(if (landscape) Alignment.BottomEnd else Alignment.BottomCenter).padding(GlassTheme.spacing.sm),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(GlassTheme.spacing.sm),
-                ) {
-                    if (exposureOpen) ExposurePanel(state, viewModel::onExposureChange)
-                    ZoomAndExposureRow(state, zoom, onZoomTo = viewModel::onZoomTo, onExposure = { exposureOpen = !exposureOpen }, exposureOpen = exposureOpen)
-                    SpeedAndSizeControls(state.teleprompter, viewModel::onSpeedStep, viewModel::onFontStep)
-                    RecordControls(
-                        state = state,
-                        prompterPlaying = prompter.playing,
-                        onTogglePrompter = { prompter.playing = !prompter.playing },
-                        onRecord = viewModel::onRecordClick,
-                        onPauseResume = viewModel::onPauseResumeClick,
-                    )
+        // While recording only REC, pause/stop and the prompter toggle stay; the rest fades out.
+        val showChrome = chromeVisible || !recording
+        Box(Modifier.fillMaxSize().safeDrawingPadding()) {
+            AnimatedVisibility(visible = showChrome, enter = fadeIn(), exit = fadeOut(), modifier = Modifier.align(Alignment.TopCenter)) {
+                TopChrome(state, onBack = viewModel::onBackRequest, onTorch = viewModel::onTorchToggle, onSwitch = viewModel::onSwitchLens)
+            }
+            Column(
+                Modifier.align(if (landscape) Alignment.BottomEnd else Alignment.BottomCenter).padding(GlassTheme.spacing.sm),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(GlassTheme.spacing.sm),
+            ) {
+                AnimatedVisibility(visible = showChrome, enter = fadeIn(), exit = fadeOut()) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(GlassTheme.spacing.sm),
+                    ) {
+                        if (exposureOpen) ExposurePanel(state, viewModel::onExposureChange)
+                        ZoomAndExposureRow(state, zoom, onZoomTo = viewModel::onZoomTo, onExposure = { exposureOpen = !exposureOpen }, exposureOpen = exposureOpen)
+                        SpeedAndSizeControls(state.teleprompter, viewModel::onSpeedStep, viewModel::onFontStep)
+                    }
                 }
+                RecordControls(
+                    state = state,
+                    prompterPlaying = prompter.playing,
+                    onTogglePrompter = { prompter.playing = !prompter.playing },
+                    onRecord = viewModel::onRecordClick,
+                    onPauseResume = viewModel::onPauseResumeClick,
+                )
             }
         }
 

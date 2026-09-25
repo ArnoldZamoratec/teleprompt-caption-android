@@ -2,6 +2,7 @@ package com.arnoldcode.glassprompt.data.di
 
 import android.content.Context
 import androidx.room.Room
+import com.arnoldcode.glassprompt.data.local.dao.CaptionDao
 import com.arnoldcode.glassprompt.data.local.dao.ProjectDao
 import com.arnoldcode.glassprompt.data.local.dao.TakeDao
 import com.arnoldcode.glassprompt.data.local.database.GlassPromptDatabase
@@ -29,4 +30,7 @@ object DatabaseModule {
 
     @Provides
     fun provideTakeDao(database: GlassPromptDatabase): TakeDao = database.takeDao()
+
+    @Provides
+    fun provideCaptionDao(database: GlassPromptDatabase): CaptionDao = database.captionDao()
 }

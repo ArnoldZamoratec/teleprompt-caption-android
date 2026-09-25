@@ -9,6 +9,8 @@ import com.arnoldcode.glassprompt.core.common.AppResult
 import com.arnoldcode.glassprompt.domain.model.Take
 import com.arnoldcode.glassprompt.domain.usecase.DeleteTakeUseCase
 import com.arnoldcode.glassprompt.domain.usecase.GetProjectUseCase
+import com.arnoldcode.glassprompt.domain.usecase.ObserveCaptionTrackUseCase
+import com.arnoldcode.glassprompt.domain.usecase.TranscriptionControlUseCase
 import com.arnoldcode.glassprompt.domain.usecase.ObserveTakeUseCase
 import com.arnoldcode.glassprompt.feature.common.messageRes
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,6 +40,8 @@ class VideoReviewViewModel @Inject constructor(
     private val observeTake: ObserveTakeUseCase,
     private val getProject: GetProjectUseCase,
     private val deleteTake: DeleteTakeUseCase,
+    private val observeTrack: ObserveCaptionTrackUseCase,
+    private val transcription: TranscriptionControlUseCase,
 ) : ViewModel() {
 
     private val takeId: String = checkNotNull(savedStateHandle[ARG_TAKE_ID]) { "takeId is required" }
@@ -51,6 +55,8 @@ class VideoReviewViewModel @Inject constructor(
             val take = observeTake(takeId).first()?.takeIf { File(it.filePath).exists() }
             val name = take?.let { (getProject(it.projectId) as? AppResult.Success)?.data?.name }.orEmpty()
             _uiState.update { it.copy(isLoading = false, take = take, projectName = name) }
+            // Start captioning while the user watches the take, so the editor opens ready.
+            if (take != null && observeTrack(takeId).first() == null) transcription.start(takeId)
         }
     }
 

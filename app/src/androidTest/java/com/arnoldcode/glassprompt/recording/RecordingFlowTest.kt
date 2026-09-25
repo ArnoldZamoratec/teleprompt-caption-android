@@ -26,9 +26,9 @@ import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
+import org.junit.rules.ExternalResource
 import org.junit.Test
 import java.io.File
 import javax.inject.Inject
@@ -38,7 +38,13 @@ import javax.inject.Inject
 class RecordingFlowTest {
 
     @get:Rule(order = 0) val hiltRule = HiltAndroidRule(this)
-    @get:Rule(order = 1) val composeRule = createEmptyComposeRule()
+    // Closes the activity outside the compose rule's test loop.
+    @get:Rule(order = 1) val closeActivity = object : ExternalResource() {
+        override fun after() {
+            scenario?.close()
+        }
+    }
+    @get:Rule(order = 2) val composeRule = createEmptyComposeRule()
 
     @Inject lateinit var preferences: FakeUserPreferencesRepository
     @Inject lateinit var projects: ProjectRepository
@@ -64,11 +70,6 @@ class RecordingFlowTest {
             (projects.createProject(project) as AppResult.Success).data
         }
         scenario = ActivityScenario.launch(MainActivity::class.java)
-    }
-
-    @After
-    fun tearDown() {
-        scenario?.close()
     }
 
     private fun str(@StringRes id: Int): String =

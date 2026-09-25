@@ -7,7 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.arnoldcode.glassprompt.core.common.Logger
+import com.arnoldcode.glassprompt.domain.model.CaptionPreset
 import com.arnoldcode.glassprompt.domain.model.ThemeMode
+import com.arnoldcode.glassprompt.domain.model.TranscriptionMode
 import com.arnoldcode.glassprompt.domain.model.UserPreferences
 import com.arnoldcode.glassprompt.domain.repository.UserPreferencesRepository
 import kotlinx.coroutines.flow.Flow
@@ -49,21 +51,40 @@ class DataStoreUserPreferencesRepository @Inject constructor(
         dataStore.edit { it[Keys.ReduceEffects] = enabled }
     }
 
+    override suspend fun setTranscriptionMode(mode: TranscriptionMode) {
+        dataStore.edit { it[Keys.TranscriptionMode] = mode.name }
+    }
+
+    override suspend fun setTranscriptionLanguage(language: String) {
+        dataStore.edit { it[Keys.TranscriptionLanguage] = language }
+    }
+
+    override suspend fun setDefaultCaptionPreset(preset: CaptionPreset) {
+        dataStore.edit { it[Keys.DefaultCaptionPreset] = preset.name }
+    }
+
     private fun Preferences.toUserPreferences(): UserPreferences {
         val defaults = UserPreferences()
         return UserPreferences(
             onboardingCompleted = this[Keys.OnboardingCompleted] ?: defaults.onboardingCompleted,
-            themeMode = this[Keys.ThemeMode]
-                ?.let { stored -> ThemeMode.entries.firstOrNull { it.name == stored } }
-                ?: defaults.themeMode,
+            themeMode = enumOrNull<ThemeMode>(this[Keys.ThemeMode]) ?: defaults.themeMode,
             reduceEffects = this[Keys.ReduceEffects] ?: defaults.reduceEffects,
+            transcriptionMode = enumOrNull<TranscriptionMode>(this[Keys.TranscriptionMode]) ?: defaults.transcriptionMode,
+            transcriptionLanguage = this[Keys.TranscriptionLanguage] ?: defaults.transcriptionLanguage,
+            defaultCaptionPreset = enumOrNull<CaptionPreset>(this[Keys.DefaultCaptionPreset]) ?: defaults.defaultCaptionPreset,
         )
     }
+
+    private inline fun <reified E : Enum<E>> enumOrNull(stored: String?): E? =
+        stored?.let { name -> enumValues<E>().firstOrNull { it.name == name } }
 
     private object Keys {
         val OnboardingCompleted = booleanPreferencesKey("onboarding_completed")
         val ThemeMode = stringPreferencesKey("theme_mode")
         val ReduceEffects = booleanPreferencesKey("reduce_effects")
+        val TranscriptionMode = stringPreferencesKey("transcription_mode")
+        val TranscriptionLanguage = stringPreferencesKey("transcription_language")
+        val DefaultCaptionPreset = stringPreferencesKey("default_caption_preset")
     }
 
     private companion object {

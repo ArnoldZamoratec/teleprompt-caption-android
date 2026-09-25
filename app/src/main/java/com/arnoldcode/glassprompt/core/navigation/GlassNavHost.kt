@@ -17,6 +17,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.arnoldcode.glassprompt.core.designsystem.theme.GlassAnimations
 import com.arnoldcode.glassprompt.feature.camera.CameraScreen
+import com.arnoldcode.glassprompt.feature.captions.CaptionEditorScreen
 import com.arnoldcode.glassprompt.feature.common.ComingSoonScreen
 import com.arnoldcode.glassprompt.feature.editor.ScriptEditorScreen
 import com.arnoldcode.glassprompt.feature.home.HomeScreen
@@ -120,7 +121,12 @@ fun GlassNavHost(
                 onExport = { takeId -> navController.navigate(Route.Export(takeId)) },
             )
         }
-        composable<Route.CaptionEditor> { ComingSoonScreen(onBack = navController::popBackStack) }
+        composable<Route.CaptionEditor> {
+            CaptionEditorScreen(
+                onBack = navController::popBackStack,
+                onExport = { takeId -> navController.navigate(Route.Export(takeId)) },
+            )
+        }
         composable<Route.Export> { ComingSoonScreen(onBack = navController::popBackStack) }
         composable<Route.ExportResult> { ComingSoonScreen(onBack = navController::popBackStack) }
     }

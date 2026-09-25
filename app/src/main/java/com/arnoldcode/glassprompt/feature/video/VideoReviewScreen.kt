@@ -134,7 +134,8 @@ private fun ReviewContent(
                 state = player,
                 aspectRatio = aspect,
                 // Portrait videos would push the actions off-screen: cap their height.
-                modifier = Modifier.fillMaxWidth(if (aspect < 1f) 0.72f else 1f).align(Alignment.CenterHorizontally),
+                videoWidthFraction = if (aspect < 1f) 0.72f else 1f,
+                modifier = Modifier.fillMaxWidth(),
             )
             Text(
                 stringResource(R.string.review_info, formatClock(take.durationMs), minOf(take.width, take.height), take.frameRate),

@@ -119,12 +119,15 @@ fun VideoPlayerView(
     state: VideoPlayerState,
     aspectRatio: Float,
     modifier: Modifier = Modifier,
+    /** Width of the video relative to the player; the playback bar always spans the full width. */
+    videoWidthFraction: Float = 1f,
     overlay: @Composable () -> Unit = {},
 ) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(GlassTheme.spacing.xs)) {
         Box(
             Modifier
-                .fillMaxWidth()
+                .fillMaxWidth(videoWidthFraction)
+                .align(Alignment.CenterHorizontally)
                 .aspectRatio(aspectRatio.coerceIn(0.3f, 3f))
                 .clip(GlassTheme.shapes.large)
                 .background(Color.Black),
