@@ -8,6 +8,13 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
+
+/**
+ * When true, glass surfaces skip backdrop blur/refraction and ambient motion is frozen.
+ * Driven by the "reduce effects" preference and by the system animator-scale setting.
+ */
+val LocalReduceEffects = staticCompositionLocalOf { false }
 
 /**
  * Root theme. Provides Glass tokens through composition locals and maps them onto
@@ -16,6 +23,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 @Composable
 fun GlassTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    reduceEffects: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     val colors = if (darkTheme) DarkGlassColors else LightGlassColors
@@ -24,6 +32,9 @@ fun GlassTheme(
         LocalGlassColors provides colors,
         LocalGlassShapes provides shapes,
         LocalGlassSpacing provides GlassSpacing(),
+        LocalGlassElevation provides GlassElevation(),
+        LocalGlassAnimations provides GlassAnimations(),
+        LocalReduceEffects provides reduceEffects,
     ) {
         MaterialTheme(
             colorScheme = colors.toMaterialColorScheme(),
@@ -47,6 +58,18 @@ object GlassTheme {
     val spacing: GlassSpacing
         @Composable @ReadOnlyComposable
         get() = LocalGlassSpacing.current
+
+    val elevation: GlassElevation
+        @Composable @ReadOnlyComposable
+        get() = LocalGlassElevation.current
+
+    val animations: GlassAnimations
+        @Composable @ReadOnlyComposable
+        get() = LocalGlassAnimations.current
+
+    val reduceEffects: Boolean
+        @Composable @ReadOnlyComposable
+        get() = LocalReduceEffects.current
 }
 
 private fun GlassColors.toMaterialColorScheme(): ColorScheme {

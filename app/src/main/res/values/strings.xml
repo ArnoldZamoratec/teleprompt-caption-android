@@ -1,5 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GlassPrompt</string>
-    <string name="app_tagline">Teleprompter y subtítulos para creadores</string>
+
+    <!-- Common -->
+    <string name="action_back">Volver</string>
+    <string name="action_next">Siguiente</string>
+    <string name="action_skip">Omitir</string>
+    <string name="action_see_all">Ver todo</string>
+    <string name="coming_soon_title">Muy pronto</string>
+    <string name="coming_soon_message">Esta sección se está construyendo y estará disponible en una próxima versión.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_1_title">Graba sin memorizar</string>
+    <string name="onboarding_1_body">Tu guion se desplaza sobre la cámara a tu ritmo. Mira al lente y habla con naturalidad.</string>
+    <string name="onboarding_2_title">Subtítulos automáticos</string>
+    <string name="onboarding_2_body">Convierte tu voz en subtítulos sincronizados, en el dispositivo y sin subir nada a internet.</string>
+    <string name="onboarding_3_title">Crea contenido profesional</string>
+    <string name="onboarding_3_body">Dale estilo a tus captions, exporta en alta calidad y compártelo en tus redes favoritas.</string>
+    <string name="onboarding_start">Comenzar</string>
+    <string name="onboarding_page_indicator">Página %1$d de %2$d</string>
+    <string name="onboarding_sample_line_1">Hola, bienvenidos a mi canal.</string>
+    <string name="onboarding_sample_line_2">Hoy les muestro cómo grabar</string>
+    <string name="onboarding_sample_line_3">sin olvidar ni una palabra.</string>
+    <string name="onboarding_sample_caption">bienvenidos a mi canal</string>
+    <string name="onboarding_sample_rec">REC  00:12</string>
+    <string name="onboarding_sample_export">Exportando 1080p · 60 fps</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_projects">Proyectos</string>
+    <string name="nav_templates">Plantillas</string>
+    <string name="nav_settings">Ajustes</string>
+    <string name="nav_record">Grabar</string>
+
+    <!-- Home -->
+    <string name="home_greeting_morning">Buenos días</string>
+    <string name="home_greeting_afternoon">Buenas tardes</string>
+    <string name="home_greeting_evening">Buenas noches</string>
+    <string name="home_subtitle">¿Qué vas a crear hoy?</string>
+    <string name="home_new_project">Nuevo proyecto</string>
+    <string name="home_new_project_body">Escribe tu guion, grábate y genera subtítulos en minutos.</string>
+    <string name="home_new_project_action">Crear un proyecto nuevo</string>
+    <string name="home_quick_import">Importar guion</string>
+    <string name="home_quick_teleprompter">Teleprompter</string>
+    <string name="home_quick_record">Grabar ya</string>
+    <string name="home_recent_projects">Proyectos recientes</string>
+    <string name="home_recent_videos">Videos recientes</string>
+    <string name="home_empty_projects_title">Aún no tienes proyectos</string>
+    <string name="home_empty_projects_body">Crea tu primer proyecto para escribir un guion y empezar a grabar.</string>
+    <string name="home_empty_videos_title">Tus videos aparecerán aquí</string>
+    <string name="home_empty_videos_body">Cuando exportes tu primer video lo encontrarás en esta sección.</string>
+    <string name="home_open_settings">Abrir ajustes</string>
+    <plurals name="home_project_words">
+        <item quantity="one">%1$d palabra</item>
+        <item quantity="many">%1$d palabras</item>
+        <item quantity="other">%1$d palabras</item>
+    </plurals>
+
+    <!-- Projects / Templates -->
+    <string name="projects_empty_title">Tus proyectos</string>
+    <string name="projects_empty_body">Aquí verás, buscarás y organizarás todos tus proyectos.</string>
+    <string name="templates_empty_title">Plantillas de guion</string>
+    <string name="templates_empty_body">Estructuras listas para tutoriales, reseñas, anuncios y más.</string>
+
+    <!-- Settings -->
+    <string name="settings_appearance">Apariencia</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_dark">Oscuro</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_system">Sistema</string>
+    <string name="settings_reduce_effects">Reducir efectos</string>
+    <string name="settings_reduce_effects_body">Desactiva el desenfoque y las animaciones ambientales. Ahorra batería en equipos modestos.</string>
+    <string name="settings_privacy">Privacidad</string>
+    <string name="settings_privacy_body">Tus guiones, videos y transcripciones se guardan solo en este dispositivo.</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_version">Versión %1$s</string>
 </resources>

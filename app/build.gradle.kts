@@ -44,10 +44,18 @@ android {
     }
 
     testOptions {
+        // Instrumented tests run with system animations off (and thus GlassPrompt's reduced effects).
+        animationsDisabled = true
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
         }
+    }
+
+    sourceSets {
+        // Fakes shared by JVM unit tests and instrumented tests.
+        getByName("test").kotlin.directories += "src/sharedTest/java"
+        getByName("androidTest").kotlin.directories += "src/sharedTest/java"
     }
 
     packaging {
@@ -84,8 +92,9 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
-    implementation(libs.androidx.compose.material3.adaptive)
     implementation(libs.haze)
+    implementation(libs.haze.blur)
+    implementation(libs.haze.glass)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 

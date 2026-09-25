@@ -37,10 +37,9 @@ Todas las versiones se consultaron el 2026-09-24 en Google Maven (`dl.google.com
 | UI | Compose BOM | 2026.09.00 |
 | UI | Material 3 | vía BOM |
 | UI | material-icons-extended | 1.7.8 (R8 elimina los íconos no usados) |
-| UI | Material 3 Adaptive | 1.3.0 |
 | UI | activity-compose | 1.13.0 |
 | UI | core-splashscreen | 1.2.0 |
-| UI (blur) | Haze (`dev.chrisbanes.haze`) | 2.0.0 — *propuesta, ver §6.3* |
+| UI (blur/vidrio) | Haze `haze`, `haze-blur`, `haze-glass` (`dev.chrisbanes.haze`) | 2.0.0 — aprobado, ver §6.3 |
 | Arquitectura | lifecycle-runtime-compose / viewmodel | 2.11.0 |
 | Navegación | navigation-compose (rutas tipadas) | 2.10.2 |
 | Serialización | kotlinx-serialization-json | 1.11.0 |
@@ -88,6 +87,7 @@ Reglas de dependencia:
 - `data` implementa las interfaces de `domain` y es la única capa que conoce Room, DataStore, CameraX, Media3 y SpeechRecognizer.
 - `feature/*` (presentación) depende solo de `domain` y `core`. Nunca de `data`.
 - Toda operación falible devuelve `AppResult<T>` (`Success` / `Failure(AppError)`). `AppError` es un `sealed interface` con errores de dominio (`CameraUnavailable`, `PermissionDenied`, `StorageFull`, `TranscriptionUnavailable`, `ExportFailed`…). La UI los traduce a mensajes legibles con `stringResource` y nunca muestra texto técnico.
+- Un `StateFlow` que se lee **fuera** de la UI (por ejemplo, la condición del splash) usa `SharingStarted.Eagerly`. Con `WhileSubscribed` solo carga cuando la UI se suscribe; eso bloqueó los tests instrumentados en la Fase 3 y sería frágil en producción.
 - Los estados son explícitos y usan `sealed interface`: `RecordingState`, `TranscriptionState`, `ExportState`, `TeleprompterState` y un `UiState` por pantalla.
 
 ### 3.1 Módulos
@@ -282,7 +282,9 @@ Compose **no trae** un desenfoque del contenido de fondo: `Modifier.blur` desenf
 - **(Recomendada) Haze 2.0.0.** Librería mantenida y específica para Compose que hace el desenfoque del fondo con `RenderEffect` en API 31+ y cae a un tinte translúcido en versiones anteriores. Es una dependencia pequeña y justificada.
 - **Implementación propia.** Capturar el fondo con `GraphicsLayer` + `RenderEffect.createBlurEffect`, recortado por cada superficie. Es viable, pero reimplementa lo que Haze ya resuelve.
 
-En API < 31 y con "reducir efectos/animaciones" activo, siempre se usa el tinte translúcido (sin desenfoque). **Sobre la cámara en vivo no se aplica desenfoque** (cuesta rendimiento y térmica): se usan paneles translúcidos sin blur.
+**Implementado (Fase 3):** Haze 2.0 separa el núcleo (`hazeSource`) de los efectos. Se usa `hazeBlur` (API estable) en tarjetas, barras, paneles y diálogos mediante `Modifier.glassSurface`, y `hazeGlass` (refracción con shaders AGSL, `@ExperimentalHazeApi`, con fallback propio en Android < 13) solo en elementos protagonistas mediante `Modifier.liquidGlass`: la barra inferior y el botón de grabar. El fondo aurora se registra como fuente en la capa 0 y el contenido de cada pantalla en la capa 1; así las barras flotantes refractan el contenido y las tarjetas solo el fondo. Los diálogos (otra ventana) anulan la fuente y usan el tinte de respaldo.
+
+En API < 31, con "Reducir efectos" activo o con "Quitar animaciones" del sistema activo, siempre se usa el tinte translúcido (sin desenfoque), y las animaciones ambientales quedan estáticas. **Sobre la cámara en vivo no se aplica desenfoque** (cuesta rendimiento y térmica): se usan paneles translúcidos sin blur.
 
 ### 6.4 Componentes
 

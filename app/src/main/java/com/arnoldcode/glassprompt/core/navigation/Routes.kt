@@ -5,9 +5,8 @@ import kotlinx.serialization.Serializable
 /** Type-safe Navigation Compose destinations. Arguments are primitive IDs only. */
 sealed interface Route {
     @Serializable data object Onboarding : Route
-    @Serializable data object Main : Route
 
-    // Top-level tabs hosted inside Main.
+    // Top-level tabs (bottom bar / navigation rail).
     @Serializable data object Home : Route
     @Serializable data object Projects : Route
     @Serializable data object Templates : Route
