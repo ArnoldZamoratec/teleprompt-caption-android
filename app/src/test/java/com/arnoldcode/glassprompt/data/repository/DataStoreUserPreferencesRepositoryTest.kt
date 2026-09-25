@@ -1,6 +1,8 @@
 package com.arnoldcode.glassprompt.data.repository
 
+import androidx.datastore.core.okio.OkioStorage
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.PreferencesSerializer
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.arnoldcode.glassprompt.domain.model.ThemeMode
@@ -14,15 +16,22 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import okio.FileSystem
+import okio.Path.Companion.toOkioPath
+import java.io.File
 
 class DataStoreUserPreferencesRepositoryTest {
 
     @get:Rule val tmp = TemporaryFolder()
 
     private val testScope = TestScope(UnconfinedTestDispatcher())
-    private val dataStore = PreferenceDataStoreFactory.create(scope = testScope.backgroundScope) {
-        tmp.newFile("prefs.preferences_pb")
-    }
+    // Okio storage replaces the file atomically; the java.io one can't rename over an existing file on Windows.
+    private val dataStore = PreferenceDataStoreFactory.create(
+        storage = OkioStorage(FileSystem.SYSTEM, PreferencesSerializer) {
+            File(tmp.root, "prefs.preferences_pb").toOkioPath()
+        },
+        scope = testScope.backgroundScope,
+    )
     private val repository = DataStoreUserPreferencesRepository(dataStore, NoOpLogger)
 
     @Test

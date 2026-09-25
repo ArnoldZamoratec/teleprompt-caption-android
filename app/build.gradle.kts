@@ -56,6 +56,8 @@ android {
         // Fakes shared by JVM unit tests and instrumented tests.
         getByName("test").kotlin.directories += "src/sharedTest/java"
         getByName("androidTest").kotlin.directories += "src/sharedTest/java"
+        // Exported Room schemas, read by MigrationTestHelper.
+        getByName("androidTest").assets.directories += "$projectDir/schemas"
     }
 
     packaging {

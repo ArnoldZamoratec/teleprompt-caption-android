@@ -3,7 +3,9 @@ package com.arnoldcode.glassprompt.data.di
 import android.content.Context
 import androidx.room.Room
 import com.arnoldcode.glassprompt.data.local.dao.ProjectDao
+import com.arnoldcode.glassprompt.data.local.dao.TakeDao
 import com.arnoldcode.glassprompt.data.local.database.GlassPromptDatabase
+import com.arnoldcode.glassprompt.data.local.database.Migrations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,8 +20,13 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): GlassPromptDatabase =
-        Room.databaseBuilder(context, GlassPromptDatabase::class.java, GlassPromptDatabase.NAME).build()
+        Room.databaseBuilder(context, GlassPromptDatabase::class.java, GlassPromptDatabase.NAME)
+            .addMigrations(*Migrations.ALL)
+            .build()
 
     @Provides
     fun provideProjectDao(database: GlassPromptDatabase): ProjectDao = database.projectDao()
+
+    @Provides
+    fun provideTakeDao(database: GlassPromptDatabase): TakeDao = database.takeDao()
 }

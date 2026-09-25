@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.arnoldcode.glassprompt.data.di.DatabaseModule
 import com.arnoldcode.glassprompt.data.local.dao.ProjectDao
+import com.arnoldcode.glassprompt.data.local.dao.TakeDao
 import com.arnoldcode.glassprompt.data.local.database.GlassPromptDatabase
 import dagger.Module
 import dagger.Provides
@@ -24,4 +25,7 @@ object TestDatabaseModule {
 
     @Provides
     fun provideProjectDao(database: GlassPromptDatabase): ProjectDao = database.projectDao()
+
+    @Provides
+    fun provideTakeDao(database: GlassPromptDatabase): TakeDao = database.takeDao()
 }

@@ -6,6 +6,7 @@ import com.arnoldcode.glassprompt.core.common.IdGenerator
 import com.arnoldcode.glassprompt.core.common.Logger
 import com.arnoldcode.glassprompt.core.common.safeCall
 import com.arnoldcode.glassprompt.data.local.dao.ProjectDao
+import com.arnoldcode.glassprompt.data.local.dao.TakeDao
 import com.arnoldcode.glassprompt.data.local.entities.ProjectEntity
 import com.arnoldcode.glassprompt.data.local.entities.ScriptEntity
 import com.arnoldcode.glassprompt.data.local.entities.toColumns
@@ -15,6 +16,7 @@ import com.arnoldcode.glassprompt.domain.model.NewProject
 import com.arnoldcode.glassprompt.domain.model.Project
 import com.arnoldcode.glassprompt.domain.model.ProjectSummary
 import com.arnoldcode.glassprompt.domain.model.Script
+import com.arnoldcode.glassprompt.domain.repository.MediaStorage
 import com.arnoldcode.glassprompt.domain.repository.ProjectRepository
 import com.arnoldcode.glassprompt.domain.repository.ScriptRepository
 import com.arnoldcode.glassprompt.domain.script.ScriptText
@@ -28,6 +30,8 @@ import javax.inject.Singleton
 @Singleton
 class RoomProjectRepository @Inject constructor(
     private val dao: ProjectDao,
+    private val takeDao: TakeDao,
+    private val storage: MediaStorage,
     private val clock: Clock,
     private val ids: IdGenerator,
     private val logger: Logger,
@@ -84,8 +88,11 @@ class RoomProjectRepository @Inject constructor(
         copy.id
     }
 
+    /** Rows cascade (takes → project); video files are removed once the rows are gone. */
     override suspend fun deleteProject(id: String): AppResult<Unit> = result {
+        val files = takeDao.filePathsOf(id)
         if (!dao.deleteProjectWithScript(id)) throw NotFound("project $id")
+        files.forEach(storage::delete)
     }
 
     private inline fun <T> result(block: () -> T): AppResult<T> =

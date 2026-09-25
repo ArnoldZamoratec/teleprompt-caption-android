@@ -11,10 +11,12 @@ import com.arnoldcode.glassprompt.core.common.IdGenerator
 import com.arnoldcode.glassprompt.data.local.database.GlassPromptDatabase
 import com.arnoldcode.glassprompt.domain.model.CameraLens
 import com.arnoldcode.glassprompt.domain.model.NewProject
+import com.arnoldcode.glassprompt.domain.model.NewTake
 import com.arnoldcode.glassprompt.domain.model.RecordingSettings
 import com.arnoldcode.glassprompt.domain.model.TeleprompterSettings
 import com.arnoldcode.glassprompt.domain.model.TextPosition
 import com.arnoldcode.glassprompt.domain.model.VideoResolution
+import com.arnoldcode.glassprompt.testing.FakeMediaStorage
 import com.arnoldcode.glassprompt.testing.NoOpLogger
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
@@ -45,7 +47,9 @@ class RoomProjectRepositoryTest {
     private var counter = 0
     private val ids = IdGenerator { "id${++counter}" }
 
-    private val projects = RoomProjectRepository(database.projectDao(), clock, ids, NoOpLogger)
+    private val storage = FakeMediaStorage()
+    private val projects = RoomProjectRepository(database.projectDao(), database.takeDao(), storage, clock, ids, NoOpLogger)
+    private val takes = RoomTakeRepository(database.takeDao(), storage, clock, ids, NoOpLogger)
     private val scripts = RoomScriptRepository(database.projectDao(), clock, NoOpLogger)
 
     @After
@@ -119,6 +123,31 @@ class RoomProjectRepositoryTest {
 
         assertThat(projects.observeProjects().first()).isEmpty()
         assertThat((scripts.getScript(scriptId) as AppResult.Failure).error).isInstanceOf(AppError.NotFound::class.java)
+    }
+
+    @Test
+    fun takesAreListedNewestFirstAndDeletedWithTheirFiles() = runTest {
+        val id = create("Con tomas")
+        takes.addTake(NewTake(id, "/takes/a.mp4", 1_000, 1080, 1920, 30))
+        nowMillis = 2_000
+        val second = (takes.addTake(NewTake(id, "/takes/b.mp4", 2_000, 1080, 1920, 30)) as AppResult.Success).data
+
+        assertThat(takes.observeTakes(id).first().map { it.filePath }).containsExactly("/takes/b.mp4", "/takes/a.mp4").inOrder()
+
+        takes.deleteTake(second)
+        assertThat(storage.deleted).containsExactly("/takes/b.mp4")
+        assertThat(takes.observeTakes(id).first()).hasSize(1)
+    }
+
+    @Test
+    fun deletingAProjectCascadesToTakesAndRemovesTheirVideos() = runTest {
+        val id = create("Proyecto")
+        val takeId = (takes.addTake(NewTake(id, "/takes/a.mp4", 1_000, 1080, 1920, 30)) as AppResult.Success).data
+
+        projects.deleteProject(id)
+
+        assertThat(storage.deleted).containsExactly("/takes/a.mp4")
+        assertThat(takes.getTake(takeId)).isInstanceOf(AppResult.Failure::class.java)
     }
 
     @Test

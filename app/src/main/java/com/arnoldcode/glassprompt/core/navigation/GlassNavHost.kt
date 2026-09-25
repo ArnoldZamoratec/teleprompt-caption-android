@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.arnoldcode.glassprompt.core.designsystem.theme.GlassAnimations
+import com.arnoldcode.glassprompt.feature.camera.CameraScreen
 import com.arnoldcode.glassprompt.feature.common.ComingSoonScreen
 import com.arnoldcode.glassprompt.feature.editor.ScriptEditorScreen
 import com.arnoldcode.glassprompt.feature.home.HomeScreen
@@ -23,7 +24,9 @@ import com.arnoldcode.glassprompt.feature.onboarding.OnboardingScreen
 import com.arnoldcode.glassprompt.feature.projectsetup.ProjectSetupScreen
 import com.arnoldcode.glassprompt.feature.projects.ProjectsScreen
 import com.arnoldcode.glassprompt.feature.settings.SettingsScreen
+import com.arnoldcode.glassprompt.feature.teleprompter.TeleprompterScreen
 import com.arnoldcode.glassprompt.feature.templates.TemplatesScreen
+import com.arnoldcode.glassprompt.feature.video.VideoReviewScreen
 
 private const val ENTER_MS = 260
 private const val EXIT_MS = 160
@@ -101,8 +104,24 @@ fun GlassNavHost(
         }
 
         // Flow destinations implemented in later phases.
-        composable<Route.Teleprompter> { ComingSoonScreen(onBack = navController::popBackStack) }
-        composable<Route.Camera> { ComingSoonScreen(onBack = navController::popBackStack) }
+        composable<Route.Teleprompter> { TeleprompterScreen(onBack = navController::popBackStack) }
+        composable<Route.Camera> {
+            CameraScreen(
+                onExit = navController::popBackStack,
+                onTakeSaved = { takeId -> navController.navigate(Route.VideoReview(takeId)) },
+            )
+        }
+        composable<Route.VideoReview> {
+            VideoReviewScreen(
+                onBack = navController::popBackStack,
+                // The camera stays below the review, so "record again" is a plain back.
+                onRecordAgain = navController::popBackStack,
+                onCaptions = { takeId -> navController.navigate(Route.CaptionEditor(takeId)) },
+                onExport = { takeId -> navController.navigate(Route.Export(takeId)) },
+            )
+        }
+        composable<Route.CaptionEditor> { ComingSoonScreen(onBack = navController::popBackStack) }
+        composable<Route.Export> { ComingSoonScreen(onBack = navController::popBackStack) }
         composable<Route.ExportResult> { ComingSoonScreen(onBack = navController::popBackStack) }
     }
 }

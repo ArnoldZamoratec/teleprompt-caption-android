@@ -203,6 +203,8 @@ enum class CaptionAnimation { NONE, FADE, POP, SLIDE, SCALE, WORD_HIGHLIGHT, KAR
 - El teleprompter se superpone **solo en la vista previa**. Nunca queda grabado en el video.
 - Errores comunes (cámara ocupada, permiso revocado, sin espacio) se muestran como `AppError` con mensajes claros. Antes de grabar se comprueba el espacio libre.
 
+**Implementado (Fase 5):** `ScrollEngine` deriva la velocidad del propio guion maquetado (distancia total ÷ tiempo de lectura a 150 ppm), así que "1.0x" es igual con cualquier tamaño, interlineado o pantalla. `PrompterSettingsSession` comparte carga del guion y ajustes entre el teleprompter de ensayo y la cámara, y guarda los cambios con debounce para que un pellizco no escriba en cada frame. La cámara vive tras la interfaz `CameraController` (implementada con CameraX en `data/multimedia`), de modo que `CameraViewModel` se prueba sin hardware; la configuración pedida se ajusta a lo que el dispositivo soporta y se informa lo realmente aplicado. Antes de grabar se reserva el archivo y se comprueba el espacio (`StorageManager.getAllocatableBytes`); una grabación vacía o fallida borra su archivo en vez de crear una toma. La base de datos pasa a v2 con la tabla `takes` y una migración escrita a mano, probada con `MigrationTestHelper`. La revisión de la toma usa Media3 (`ContentFrame`) con la posición observable, preparada para superponer captions en la Fase 6.
+
 ### 5.3 Transcripción (desacoplada del proveedor)
 
 ```kotlin

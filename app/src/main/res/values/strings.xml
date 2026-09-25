@@ -10,6 +10,7 @@
     <string name="action_cancel">Cancelar</string>
     <string name="action_close">Cerrar</string>
     <string name="action_delete">Eliminar</string>
+    <string name="action_retry">Reintentar</string>
     <string name="time_just_now">Justo ahora</string>
     <string name="duration_min_sec">%1$d min %2$d s</string>
     <string name="duration_sec">%1$d s</string>
@@ -154,6 +155,60 @@
         <item quantity="many">%1$d reemplazos</item>
         <item quantity="other">%1$d reemplazos</item>
     </plurals>
+
+    <!-- Teleprompter -->
+    <string name="prompter_play">Reproducir teleprompter</string>
+    <string name="prompter_pause">Pausar teleprompter</string>
+    <string name="prompter_restart">Volver al inicio</string>
+    <string name="prompter_slower">Más lento</string>
+    <string name="prompter_faster">Más rápido</string>
+    <string name="prompter_smaller">Texto más pequeño</string>
+    <string name="prompter_bigger">Texto más grande</string>
+    <string name="prompter_remaining">Quedan %1$s</string>
+    <string name="prompter_position_top">Arriba</string>
+    <string name="prompter_position_center">Centro</string>
+    <string name="prompter_position_bottom">Abajo</string>
+    <string name="prompter_empty_title">El guion está vacío</string>
+    <string name="prompter_empty_body">Escribe tu guion en el editor para verlo aquí.</string>
+
+    <!-- Camera -->
+    <string name="camera_permission_title">Cámara y micrófono</string>
+    <string name="camera_permission_body">Para grabarte mientras lees el guion y generar subtítulos con tu voz. Nada sale de tu teléfono.</string>
+    <string name="camera_permission_blocked">Los permisos están desactivados. Actívalos en los ajustes de la app para poder grabar.</string>
+    <string name="camera_permission_allow">Permitir</string>
+    <string name="camera_permission_settings">Abrir ajustes</string>
+    <string name="camera_error_title">La cámara no está disponible</string>
+    <string name="camera_record">Empezar a grabar</string>
+    <string name="camera_stop">Terminar grabación</string>
+    <string name="camera_cancel_countdown">Cancelar cuenta atrás</string>
+    <string name="camera_pause">Pausar grabación</string>
+    <string name="camera_resume">Reanudar grabación</string>
+    <string name="camera_switch">Cambiar de cámara</string>
+    <string name="camera_torch_on">Encender linterna</string>
+    <string name="camera_torch_off">Apagar linterna</string>
+    <string name="camera_exposure">Exposición</string>
+    <string name="camera_focus_hint">Vista de la cámara. Toca para enfocar, pellizca para acercar.</string>
+    <string name="camera_quality">%1$s · %2$d fps</string>
+    <string name="camera_rec_label">REC %1$s</string>
+    <string name="camera_paused_label">PAUSA %1$s</string>
+    <string name="camera_discard_title">¿Descartar la grabación?</string>
+    <string name="camera_discard_body">Si sales ahora, esta toma se perderá.</string>
+    <string name="camera_discard_confirm">Descartar</string>
+    <string name="camera_discard_keep">Seguir grabando</string>
+
+    <!-- Video review -->
+    <string name="review_title">Toma</string>
+    <string name="review_info">%1$s · %2$dp · %3$d fps</string>
+    <string name="review_captions">Generar subtítulos</string>
+    <string name="review_export_plain">Exportar sin subtítulos</string>
+    <string name="review_record_again">Grabar otra toma</string>
+    <string name="review_delete">Eliminar toma</string>
+    <string name="review_delete_title">¿Eliminar esta toma?</string>
+    <string name="review_delete_body">El video se borrará del teléfono. Esta acción no se puede deshacer.</string>
+    <string name="review_missing_title">No encontramos este video</string>
+    <string name="review_missing_body">Puede que se haya eliminado.</string>
+    <string name="player_play">Reproducir</string>
+    <string name="player_pause">Pausar</string>
 
     <!-- Templates -->
     <string name="templates_subtitle">Empieza con una estructura probada y hazla tuya.</string>
