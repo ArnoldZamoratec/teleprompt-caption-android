@@ -13,14 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +35,7 @@ import com.arnoldcode.glassprompt.BuildConfig
 import com.arnoldcode.glassprompt.R
 import com.arnoldcode.glassprompt.core.designsystem.component.GlassChip
 import com.arnoldcode.glassprompt.core.designsystem.component.GlassPanel
+import com.arnoldcode.glassprompt.core.designsystem.component.GlassSwitchRow
 import com.arnoldcode.glassprompt.core.designsystem.glass.GlassBackdrop
 import com.arnoldcode.glassprompt.core.designsystem.theme.GlassTheme
 import com.arnoldcode.glassprompt.core.navigation.LocalShellContentPadding
@@ -128,33 +125,12 @@ private fun AppearanceGroup(
                 )
             }
         }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .toggleable(
-                    value = preferences.reduceEffects,
-                    role = Role.Switch,
-                    onValueChange = onReduceEffectsChanged,
-                )
-                .padding(vertical = GlassTheme.spacing.xs),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(stringResource(R.string.settings_reduce_effects), style = MaterialTheme.typography.titleSmall, color = colors.textPrimary)
-                Text(stringResource(R.string.settings_reduce_effects_body), style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
-            }
-            Switch(
-                checked = preferences.reduceEffects,
-                onCheckedChange = null,
-                colors = SwitchDefaults.colors(
-                    checkedTrackColor = colors.accent,
-                    checkedThumbColor = colors.onAccent,
-                    uncheckedTrackColor = colors.glassFillStrong,
-                    uncheckedThumbColor = colors.textSecondary,
-                    uncheckedBorderColor = colors.glassBorderHighlight,
-                ),
-            )
-        }
+        GlassSwitchRow(
+            title = stringResource(R.string.settings_reduce_effects),
+            supportingText = stringResource(R.string.settings_reduce_effects_body),
+            checked = preferences.reduceEffects,
+            onCheckedChange = onReduceEffectsChanged,
+        )
     }
 }
 

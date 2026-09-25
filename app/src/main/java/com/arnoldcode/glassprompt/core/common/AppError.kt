@@ -9,6 +9,9 @@ sealed interface AppError {
     data class RecordingFailed(override val cause: Throwable? = null) : AppError
     data object StorageFull : AppError
     data class FileNotReadable(override val cause: Throwable? = null) : AppError
+    data object FileTooLarge : AppError
+    data object EmptyContent : AppError
+    data class InvalidInput(val field: String) : AppError
     data class TranscriptionUnavailable(override val cause: Throwable? = null) : AppError
     data class ExportFailed(override val cause: Throwable? = null) : AppError
     data class NotFound(val what: String) : AppError

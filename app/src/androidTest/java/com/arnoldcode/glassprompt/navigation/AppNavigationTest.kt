@@ -100,7 +100,7 @@ class AppNavigationTest {
         launch(UserPreferences(onboardingCompleted = true))
 
         composeRule.onNodeWithTag("home_new_project").performClick()
-        composeRule.onNodeWithText(str(R.string.coming_soon_message)).assertIsDisplayed()
+        composeRule.onNodeWithTag("project_setup_screen").assertIsDisplayed()
 
         composeRule.onNodeWithContentDescription(str(R.string.action_back)).performClick()
         composeRule.onNodeWithTag("home_screen").assertIsDisplayed()

@@ -13,8 +13,15 @@ sealed interface Route {
     @Serializable data object Settings : Route
 
     // Creation / recording flow.
-    @Serializable data class ProjectSetup(val projectId: String? = null) : Route
-    @Serializable data class ScriptEditor(val projectId: String) : Route
+    /** Creates a project (optionally from [templateId]) or edits [projectId]. */
+    @Serializable data class ProjectSetup(
+        val projectId: String? = null,
+        val templateId: String? = null,
+        val importScript: Boolean = false,
+    ) : Route
+
+    /** [launchImport] opens the document picker as soon as the editor is ready. */
+    @Serializable data class ScriptEditor(val projectId: String, val launchImport: Boolean = false) : Route
     @Serializable data class Teleprompter(val projectId: String) : Route
     @Serializable data class Camera(val projectId: String) : Route
     @Serializable data class VideoReview(val takeId: String) : Route

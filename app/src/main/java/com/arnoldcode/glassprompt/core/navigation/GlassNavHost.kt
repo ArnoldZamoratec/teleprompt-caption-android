@@ -14,10 +14,13 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
 import com.arnoldcode.glassprompt.core.designsystem.theme.GlassAnimations
 import com.arnoldcode.glassprompt.feature.common.ComingSoonScreen
+import com.arnoldcode.glassprompt.feature.editor.ScriptEditorScreen
 import com.arnoldcode.glassprompt.feature.home.HomeScreen
 import com.arnoldcode.glassprompt.feature.onboarding.OnboardingScreen
+import com.arnoldcode.glassprompt.feature.projectsetup.ProjectSetupScreen
 import com.arnoldcode.glassprompt.feature.projects.ProjectsScreen
 import com.arnoldcode.glassprompt.feature.settings.SettingsScreen
 import com.arnoldcode.glassprompt.feature.templates.TemplatesScreen
@@ -52,7 +55,7 @@ fun GlassNavHost(
         composable<Route.Home> {
             HomeScreen(
                 onNewProject = { navController.navigate(Route.ProjectSetup()) },
-                onImportScript = { navController.navigate(Route.ProjectSetup()) },
+                onImportScript = { navController.navigate(Route.ProjectSetup(importScript = true)) },
                 onOpenTeleprompter = { navController.navigate(Route.ProjectSetup()) },
                 onRecord = { navController.navigate(Route.ProjectSetup()) },
                 onOpenProject = { id -> navController.navigate(Route.ScriptEditor(id)) },
@@ -61,13 +64,45 @@ fun GlassNavHost(
                 onOpenSettings = { navController.navigateToTab(TopLevelDestination.SETTINGS) },
             )
         }
-        composable<Route.Projects> { ProjectsScreen() }
-        composable<Route.Templates> { TemplatesScreen() }
+        composable<Route.Projects> {
+            ProjectsScreen(
+                onNewProject = { navController.navigate(Route.ProjectSetup()) },
+                onOpenProject = { id -> navController.navigate(Route.ScriptEditor(id)) },
+                onEditProject = { id -> navController.navigate(Route.ProjectSetup(projectId = id)) },
+            )
+        }
+        composable<Route.Templates> {
+            TemplatesScreen(onUseTemplate = { id -> navController.navigate(Route.ProjectSetup(templateId = id)) })
+        }
         composable<Route.Settings> { SettingsScreen() }
 
+        composable<Route.ProjectSetup> { entry ->
+            val route = entry.toRoute<Route.ProjectSetup>()
+            ProjectSetupScreen(
+                onBack = navController::popBackStack,
+                // Setup is replaced by the editor so Back from the editor returns to where the flow began.
+                onCreated = { id ->
+                    navController.navigate(Route.ScriptEditor(id, launchImport = route.importScript)) {
+                        popUpTo<Route.ProjectSetup> { inclusive = true }
+                    }
+                },
+                onUpdated = navController::popBackStack,
+            )
+        }
+        composable<Route.ScriptEditor> { entry ->
+            val route = entry.toRoute<Route.ScriptEditor>()
+            ScriptEditorScreen(
+                launchImport = route.launchImport,
+                onBack = navController::popBackStack,
+                onEditProject = { navController.navigate(Route.ProjectSetup(projectId = route.projectId)) },
+                onRehearse = { navController.navigate(Route.Teleprompter(route.projectId)) },
+                onRecord = { navController.navigate(Route.Camera(route.projectId)) },
+            )
+        }
+
         // Flow destinations implemented in later phases.
-        composable<Route.ProjectSetup> { ComingSoonScreen(onBack = navController::popBackStack) }
-        composable<Route.ScriptEditor> { ComingSoonScreen(onBack = navController::popBackStack) }
+        composable<Route.Teleprompter> { ComingSoonScreen(onBack = navController::popBackStack) }
+        composable<Route.Camera> { ComingSoonScreen(onBack = navController::popBackStack) }
         composable<Route.ExportResult> { ComingSoonScreen(onBack = navController::popBackStack) }
     }
 }

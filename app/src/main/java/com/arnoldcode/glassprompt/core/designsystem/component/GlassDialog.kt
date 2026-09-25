@@ -45,7 +45,12 @@ fun GlassDialog(
                 modifier = modifier
                     .widthIn(max = 420.dp)
                     .fillMaxWidth()
-                    .glassSurface(GlassTheme.shapes.extraLarge, GlassTheme.elevation.floating)
+                    .glassSurface(
+                        GlassTheme.shapes.extraLarge,
+                        GlassTheme.elevation.floating,
+                        // The dialog window cannot blur what is behind it; keep text legible.
+                        tint = GlassTheme.colors.backgroundElevated.copy(alpha = 0.92f),
+                    )
                     .padding(GlassTheme.spacing.lg)
                     .semantics { paneTitle = title },
                 verticalArrangement = Arrangement.spacedBy(GlassTheme.spacing.md),

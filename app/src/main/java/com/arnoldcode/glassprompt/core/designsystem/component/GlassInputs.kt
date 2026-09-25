@@ -18,6 +18,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -25,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -140,6 +144,7 @@ fun GlassTextField(
     errorText: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    focusRequester: FocusRequester? = null,
 ) {
     val colors = GlassTheme.colors
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(GlassTheme.spacing.xxs)) {
@@ -155,6 +160,7 @@ fun GlassTextField(
             keyboardActions = keyboardActions,
             modifier = Modifier
                 .fillMaxWidth()
+                .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
                 .semantics {
                     if (label != null) contentDescription = label
                     if (errorText != null) error(errorText)
@@ -180,5 +186,43 @@ fun GlassTextField(
             },
         )
         if (errorText != null) Text(errorText, style = MaterialTheme.typography.bodySmall, color = colors.error)
+    }
+}
+
+/** Full-width toggle row: title, optional supporting text and a switch. The whole row is the touch target. */
+@Composable
+fun GlassSwitchRow(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    supportingText: String? = null,
+) {
+    val colors = GlassTheme.colors
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = GlassTheme.spacing.minTouchTarget)
+            .toggleable(value = checked, role = Role.Switch, onValueChange = onCheckedChange)
+            .padding(vertical = GlassTheme.spacing.xs),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleSmall, color = colors.textPrimary)
+            if (supportingText != null) {
+                Text(supportingText, style = MaterialTheme.typography.bodySmall, color = colors.textSecondary)
+            }
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = null,
+            colors = SwitchDefaults.colors(
+                checkedTrackColor = colors.accent,
+                checkedThumbColor = colors.onAccent,
+                uncheckedTrackColor = colors.glassFillStrong,
+                uncheckedThumbColor = colors.textSecondary,
+                uncheckedBorderColor = colors.glassBorderHighlight,
+            ),
+        )
     }
 }

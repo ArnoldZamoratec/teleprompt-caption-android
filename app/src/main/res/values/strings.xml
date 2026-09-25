@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="es">
     <string name="app_name">GlassPrompt</string>
 
     <!-- Common -->
@@ -7,6 +7,12 @@
     <string name="action_next">Siguiente</string>
     <string name="action_skip">Omitir</string>
     <string name="action_see_all">Ver todo</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="time_just_now">Justo ahora</string>
+    <string name="duration_min_sec">%1$d min %2$d s</string>
+    <string name="duration_sec">%1$d s</string>
     <string name="coming_soon_title">Muy pronto</string>
     <string name="coming_soon_message">Esta sección se está construyendo y estará disponible en una próxima versión.</string>
 
@@ -57,11 +63,123 @@
         <item quantity="other">%1$d palabras</item>
     </plurals>
 
-    <!-- Projects / Templates -->
-    <string name="projects_empty_title">Tus proyectos</string>
-    <string name="projects_empty_body">Aquí verás, buscarás y organizarás todos tus proyectos.</string>
-    <string name="templates_empty_title">Plantillas de guion</string>
-    <string name="templates_empty_body">Estructuras listas para tutoriales, reseñas, anuncios y más.</string>
+    <!-- Projects -->
+    <string name="projects_empty_title">Aún no tienes proyectos</string>
+    <string name="projects_empty_body">Crea un proyecto para escribir tu guion, grabarte y generar subtítulos.</string>
+    <string name="projects_new">Nuevo</string>
+    <string name="projects_search">Buscar proyectos</string>
+    <string name="projects_no_results_title">Sin resultados</string>
+    <string name="projects_no_results_body">Ningún proyecto coincide con “%1$s”.</string>
+    <string name="projects_open_script">Abrir guion</string>
+    <string name="projects_more_actions">Más acciones para %1$s</string>
+    <string name="projects_action_settings">Ajustes del proyecto</string>
+    <string name="projects_action_duplicate">Duplicar</string>
+    <string name="projects_delete_title">¿Eliminar proyecto?</string>
+    <string name="projects_delete_body">Se eliminará “%1$s” con su guion. Esta acción no se puede deshacer.</string>
+    <string name="projects_deleted">Proyecto eliminado</string>
+    <string name="projects_duplicated">Proyecto duplicado</string>
+
+    <!-- Project setup -->
+    <string name="setup_title_new">Nuevo proyecto</string>
+    <string name="setup_title_edit">Ajustes del proyecto</string>
+    <string name="setup_name_label">Nombre del proyecto</string>
+    <string name="setup_name_placeholder">Ej.: Reseña de mi cámara</string>
+    <string name="setup_name_error">Escribe un nombre para tu proyecto.</string>
+    <string name="setup_from_template">Basado en la plantilla “%1$s”</string>
+    <string name="setup_section_recording">Grabación</string>
+    <string name="setup_camera">Cámara</string>
+    <string name="setup_camera_front">Frontal</string>
+    <string name="setup_camera_back">Trasera</string>
+    <string name="setup_orientation">Orientación</string>
+    <string name="setup_orientation_portrait">Vertical</string>
+    <string name="setup_orientation_landscape">Horizontal</string>
+    <string name="setup_resolution">Resolución</string>
+    <string name="setup_resolution_720">720p</string>
+    <string name="setup_resolution_1080">1080p</string>
+    <string name="setup_resolution_4k">4K</string>
+    <string name="setup_frame_rate">Cuadros por segundo</string>
+    <string name="setup_fps">%1$d fps</string>
+    <string name="setup_capabilities_note">Si tu cámara no admite una opción, se usará la más cercana disponible.</string>
+    <string name="setup_section_teleprompter">Teleprompter</string>
+    <string name="setup_speed">Velocidad</string>
+    <string name="setup_speed_value">%1$.1fx</string>
+    <string name="setup_font_size">Tamaño del texto</string>
+    <string name="setup_mirror">Modo espejo</string>
+    <string name="setup_mirror_body">Invierte el texto para usarlo con un cristal de teleprompter.</string>
+    <string name="setup_create">Crear y escribir guion</string>
+    <string name="setup_save">Guardar cambios</string>
+
+    <!-- Script editor -->
+    <string name="editor_title">Guion</string>
+    <string name="editor_placeholder">Escribe o pega aquí tu guion…</string>
+    <string name="editor_field_description">Texto del guion</string>
+    <string name="editor_search">Buscar y reemplazar</string>
+    <string name="editor_search_placeholder">Buscar</string>
+    <string name="editor_replace_placeholder">Reemplazar por</string>
+    <string name="editor_search_counter">%1$d de %2$d</string>
+    <string name="editor_search_none">0 de 0</string>
+    <string name="editor_search_previous">Coincidencia anterior</string>
+    <string name="editor_search_next">Coincidencia siguiente</string>
+    <string name="editor_replace">Reemplazar</string>
+    <string name="editor_replace_all">Reemplazar todo</string>
+    <string name="editor_import">Importar guion</string>
+    <string name="editor_import_file">Desde un archivo .txt</string>
+    <string name="editor_import_clipboard">Pegar del portapapeles</string>
+    <string name="editor_import_dialog_title">Ya tienes texto en el guion</string>
+    <string name="editor_import_dialog_body">¿Quieres reemplazarlo por el texto importado o añadirlo al final?</string>
+    <string name="editor_import_replace">Reemplazar</string>
+    <string name="editor_import_append">Añadir al final</string>
+    <string name="editor_imported">Guion importado</string>
+    <string name="editor_clipboard_empty">El portapapeles no tiene texto</string>
+    <string name="editor_project_settings">Ajustes del proyecto</string>
+    <string name="editor_rehearse">Ensayar</string>
+    <string name="editor_record">Grabar</string>
+    <string name="editor_saved">Guardado</string>
+    <string name="editor_saving">Guardando…</string>
+    <string name="editor_save_error">No se pudo guardar</string>
+    <string name="editor_not_found_title">No encontramos este proyecto</string>
+    <string name="editor_not_found_body">Puede que se haya eliminado.</string>
+    <plurals name="editor_words">
+        <item quantity="one">%1$d palabra</item>
+        <item quantity="many">%1$d palabras</item>
+        <item quantity="other">%1$d palabras</item>
+    </plurals>
+    <plurals name="editor_characters">
+        <item quantity="one">%1$d carácter</item>
+        <item quantity="many">%1$d caracteres</item>
+        <item quantity="other">%1$d caracteres</item>
+    </plurals>
+    <plurals name="editor_replaced">
+        <item quantity="one">%1$d reemplazo</item>
+        <item quantity="many">%1$d reemplazos</item>
+        <item quantity="other">%1$d reemplazos</item>
+    </plurals>
+
+    <!-- Templates -->
+    <string name="templates_subtitle">Empieza con una estructura probada y hazla tuya.</string>
+    <string name="templates_all">Todas</string>
+    <string name="templates_preview">Ver plantilla</string>
+    <string name="templates_use">Usar plantilla</string>
+    <string name="template_category_tutorial">Tutorial</string>
+    <string name="template_category_review">Reseña</string>
+    <string name="template_category_ad">Anuncio</string>
+    <string name="template_category_intro">Presentación</string>
+    <string name="template_category_story">Historia</string>
+    <string name="template_category_educational">Educativo</string>
+
+    <!-- Errors -->
+    <string name="error_permission">Necesitamos tu permiso para continuar.</string>
+    <string name="error_camera">No se pudo acceder a la cámara. Cierra otras apps que la estén usando.</string>
+    <string name="error_recording">La grabación se detuvo por un error. Inténtalo de nuevo.</string>
+    <string name="error_storage_full">No hay espacio suficiente en el dispositivo.</string>
+    <string name="error_file_not_readable">No se pudo leer el archivo.</string>
+    <string name="error_file_too_large">El texto es demasiado largo para un guion.</string>
+    <string name="error_empty_content">No hay texto para importar.</string>
+    <string name="error_invalid_input">Revisa los datos ingresados.</string>
+    <string name="error_transcription">No se pudieron generar los subtítulos.</string>
+    <string name="error_export">No se pudo exportar el video.</string>
+    <string name="error_not_found">No encontramos lo que buscas. Puede que se haya eliminado.</string>
+    <string name="error_unexpected">Algo salió mal. Inténtalo de nuevo.</string>
 
     <!-- Settings -->
     <string name="settings_appearance">Apariencia</string>

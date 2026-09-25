@@ -57,6 +57,8 @@ import com.arnoldcode.glassprompt.core.designsystem.component.GlassSectionHeader
 import com.arnoldcode.glassprompt.core.designsystem.glass.GlassBackdrop
 import com.arnoldcode.glassprompt.core.designsystem.theme.GlassTheme
 import com.arnoldcode.glassprompt.core.navigation.LocalShellContentPadding
+import com.arnoldcode.glassprompt.domain.model.ProjectSummary
+import com.arnoldcode.glassprompt.feature.common.relativeTimeLabel
 
 @Composable
 fun HomeScreen(
@@ -204,7 +206,7 @@ private fun QuickActionCard(icon: ImageVector, label: String, onClick: () -> Uni
 }
 
 @Composable
-private fun RecentProjectsSection(projects: List<ProjectSummaryUi>, actions: HomeActions) {
+private fun RecentProjectsSection(projects: List<ProjectSummary>, actions: HomeActions) {
     val spacing = GlassTheme.spacing
     Column(verticalArrangement = Arrangement.spacedBy(spacing.xs)) {
         GlassSectionHeader(
@@ -233,7 +235,7 @@ private fun RecentProjectsSection(projects: List<ProjectSummaryUi>, actions: Hom
 }
 
 @Composable
-private fun ProjectCard(project: ProjectSummaryUi, onOpen: (String) -> Unit) {
+private fun ProjectCard(project: ProjectSummary, onOpen: (String) -> Unit) {
     GlassCard(
         modifier = Modifier.width(200.dp),
         onClick = { onOpen(project.id) },
@@ -243,7 +245,7 @@ private fun ProjectCard(project: ProjectSummaryUi, onOpen: (String) -> Unit) {
         Spacer(Modifier.height(GlassTheme.spacing.sm))
         Text(project.name, style = MaterialTheme.typography.titleMedium, color = GlassTheme.colors.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(
-            text = pluralStringResource(R.plurals.home_project_words, project.wordCount, project.wordCount) + " · " + project.updatedLabel,
+            text = pluralStringResource(R.plurals.home_project_words, project.wordCount, project.wordCount) + " · " + relativeTimeLabel(project.updatedAt),
             style = MaterialTheme.typography.bodySmall,
             color = GlassTheme.colors.textSecondary,
             maxLines = 1,
@@ -310,8 +312,8 @@ private fun HomePreviewWithData() {
     val state = HomeUiState(
         greeting = Greeting.EVENING,
         recentProjects = listOf(
-            ProjectSummaryUi("1", "Reseña cámara", 820, "hace 2 h"),
-            ProjectSummaryUi("2", "Tutorial Kotlin", 1245, "ayer"),
+            ProjectSummary("1", "Reseña cámara", 820, System.currentTimeMillis() - 7_200_000),
+            ProjectSummary("2", "Tutorial Kotlin", 1245, System.currentTimeMillis() - 86_400_000),
         ),
         recentVideos = listOf(VideoSummaryUi("v1", "Reseña cámara", "1:24", null)),
     )

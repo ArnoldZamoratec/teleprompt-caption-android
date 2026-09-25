@@ -4,9 +4,13 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import com.arnoldcode.glassprompt.core.common.TimeProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import androidx.lifecycle.viewModelScope
+import com.arnoldcode.glassprompt.domain.model.ProjectSummary
+import com.arnoldcode.glassprompt.domain.usecase.ObserveRecentProjectsUseCase
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import java.time.LocalTime
 import javax.inject.Inject
 
@@ -19,14 +23,6 @@ internal fun greetingFor(time: LocalTime): Greeting = when (time.hour) {
 }
 
 @Immutable
-data class ProjectSummaryUi(
-    val id: String,
-    val name: String,
-    val wordCount: Int,
-    val updatedLabel: String,
-)
-
-@Immutable
 data class VideoSummaryUi(
     val id: String,
     val title: String,
@@ -37,19 +33,24 @@ data class VideoSummaryUi(
 @Immutable
 data class HomeUiState(
     val greeting: Greeting,
-    val recentProjects: List<ProjectSummaryUi> = emptyList(),
+    val recentProjects: List<ProjectSummary> = emptyList(),
     val recentVideos: List<VideoSummaryUi> = emptyList(),
 )
 
-/**
- * Home state. Recent projects and videos are wired to Room in Phase 4; until then the
- * lists are empty and the screen shows its empty states.
- */
+/** Home state: greeting plus recent projects from Room. Recent videos arrive with export (Phase 7). */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     timeProvider: TimeProvider,
+    observeRecentProjects: ObserveRecentProjectsUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState(greeting = greetingFor(timeProvider.now())))
-    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+    private val greeting = greetingFor(timeProvider.now())
+
+    val uiState: StateFlow<HomeUiState> = observeRecentProjects(RECENT_LIMIT)
+        .map { HomeUiState(greeting = greeting, recentProjects = it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(greeting))
+
+    private companion object {
+        const val RECENT_LIMIT = 10
+    }
 }

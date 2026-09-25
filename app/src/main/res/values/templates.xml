@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Built-in script templates. Text in [brackets] is meant to be replaced by the user. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="es">
+    <string name="tpl_tutorial_title">Tutorial paso a paso</string>
+    <string name="tpl_tutorial_desc">Enseña a hacer algo en pasos claros, de principio a fin.</string>
+    <string name="tpl_tutorial_body">Hola, soy [tu nombre] y hoy te enseño a [lo que vas a enseñar] en menos de [tiempo].\n\nAl final de este video vas a poder [resultado concreto], aunque nunca lo hayas hecho antes.\n\nAntes de empezar, necesitas: [materiales o requisitos].\n\nPaso uno: [primer paso]. Fíjate en [detalle importante].\n\nPaso dos: [segundo paso]. Un error común aquí es [error]; evítalo haciendo [solución].\n\nPaso tres: [tercer paso]. Y listo, ya tienes [resultado].\n\nSi te sirvió, guarda este video para tenerlo a mano y cuéntame en los comentarios qué quieres aprender después.</string>
+
+    <string name="tpl_review_title">Reseña de producto</string>
+    <string name="tpl_review_desc">Opinión honesta con pros, contras y veredicto final.</string>
+    <string name="tpl_review_body">¿Vale la pena comprar [producto] en [año]? Lo usé durante [tiempo] y te cuento todo.\n\nPrimero, lo básico: cuesta [precio] y está pensado para [tipo de usuario].\n\nLo que más me gustó: [ventaja 1], [ventaja 2] y, sobre todo, [ventaja 3].\n\nLo que no me convenció: [desventaja 1] y [desventaja 2].\n\nComparado con [alternativa], este gana en [aspecto] pero pierde en [aspecto].\n\nMi veredicto: si buscas [necesidad], es una gran opción. Si lo que te importa es [otra necesidad], mejor mira [alternativa].\n\n¿Lo tienes o lo estás pensando? Te leo en los comentarios.</string>
+
+    <string name="tpl_ad_title">Anuncio corto (30 s)</string>
+    <string name="tpl_ad_desc">Gancho, problema, solución y llamada a la acción.</string>
+    <string name="tpl_ad_body">¿Te pasa que [problema frecuente]?\n\nA mí también, hasta que descubrí [producto o servicio].\n\nCon [producto] puedes [beneficio principal] en solo [tiempo o pasos].\n\nYa lo usan [prueba social] y los resultados hablan solos.\n\nEntra a [enlace o lugar] y usa el código [código] para obtener [oferta]. Solo hasta [fecha].</string>
+
+    <string name="tpl_intro_title">Presentación del canal</string>
+    <string name="tpl_intro_desc">Cuenta quién eres y por qué deberían seguirte.</string>
+    <string name="tpl_intro_body">Hola, soy [tu nombre].\n\nEn este canal hablo de [tema] para personas que quieren [objetivo de tu audiencia].\n\nCada [frecuencia] vas a encontrar [tipo de contenido]: [ejemplo 1], [ejemplo 2] y [ejemplo 3].\n\nEmpecé porque [tu historia en una frase], y hoy quiero ayudarte a [promesa].\n\nSi eso te interesa, sígueme y activa las notificaciones. Nos vemos en el próximo video.</string>
+
+    <string name="tpl_story_title">Historia personal</string>
+    <string name="tpl_story_desc">Narra una experiencia con inicio, conflicto y aprendizaje.</string>
+    <string name="tpl_story_body">Hace [tiempo] me pasó algo que cambió mi forma de ver [tema].\n\nTodo empezó cuando [situación inicial].\n\nParecía que todo iba bien, hasta que [conflicto o giro].\n\nEn ese momento sentí [emoción] y tuve que decidir entre [opción A] y [opción B].\n\nElegí [decisión], y el resultado fue [resultado].\n\nLo que aprendí es esto: [lección].\n\nSi alguna vez te pasó algo parecido, cuéntamelo. Me encantaría leer tu historia.</string>
+
+    <string name="tpl_explainer_title">Explicación de un concepto</string>
+    <string name="tpl_explainer_desc">Explica una idea compleja de forma simple, con un ejemplo.</string>
+    <string name="tpl_explainer_body">¿Qué es [concepto] y por qué deberías entenderlo?\n\nDicho en una frase: [definición simple].\n\nImagínalo así: [analogía cotidiana].\n\nFunciona en tres partes. Primero, [parte 1]. Después, [parte 2]. Y por último, [parte 3].\n\nUn ejemplo real: [ejemplo concreto].\n\nEl error más común es pensar que [mito]; en realidad, [aclaración].\n\nAhora que lo sabes, puedes [aplicación práctica]. Si quieres que profundice en algún punto, déjalo en los comentarios.</string>
+
+    <string name="tpl_tips_title">Consejos rápidos</string>
+    <string name="tpl_tips_desc">Lista de consejos concretos, ideal para videos cortos.</string>
+    <string name="tpl_tips_body">[Número] consejos para [objetivo] que me hubiera gustado saber antes.\n\nUno: [consejo 1]. Parece obvio, pero casi nadie lo hace.\n\nDos: [consejo 2]. Esto solo ya te ahorra [beneficio].\n\nTres: [consejo 3]. Es mi favorito porque [razón].\n\nY un extra: [consejo extra].\n\n¿Cuál vas a probar primero? Guárdalo para no olvidarlo.</string>
+
+    <string name="tpl_launch_title">Anuncio de lanzamiento</string>
+    <string name="tpl_launch_desc">Presenta algo nuevo y genera expectativa.</string>
+    <string name="tpl_launch_body">Llevo [tiempo] trabajando en algo y por fin puedo contártelo.\n\nLes presento [nombre del lanzamiento].\n\nLo creé porque [problema que resuelve].\n\nCon [nombre] vas a poder [beneficio 1], [beneficio 2] y [beneficio 3].\n\nEstará disponible el [fecha] en [lugar].\n\nLas primeras [cantidad] personas tendrán [beneficio especial]. Deja tu correo en [enlace] para no perdértelo.</string>
+</resources>

@@ -1,11 +1,19 @@
 package com.arnoldcode.glassprompt.feature.home
 
+import app.cash.turbine.test
 import com.arnoldcode.glassprompt.core.common.TimeProvider
+import com.arnoldcode.glassprompt.domain.usecase.ObserveRecentProjectsUseCase
+import com.arnoldcode.glassprompt.testing.FakeProjectRepository
+import com.arnoldcode.glassprompt.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
+import org.junit.Rule
 import org.junit.Test
 import java.time.LocalTime
 
 class HomeViewModelTest {
+
+    @get:Rule val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `greeting boundaries follow the time of day`() {
@@ -19,12 +27,17 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `initial state uses the injected clock and starts with empty lists`() {
-        val viewModel = HomeViewModel(TimeProvider { LocalTime.of(9, 30) })
+    fun `state combines the greeting with recent projects`() = runTest {
+        val repository = FakeProjectRepository()
+        repository.seed("Viejo", updatedAt = 1)
+        repository.seed("Nuevo", updatedAt = 2)
+        val viewModel = HomeViewModel(TimeProvider { LocalTime.of(9, 30) }, ObserveRecentProjectsUseCase(repository))
 
-        val state = viewModel.uiState.value
-        assertThat(state.greeting).isEqualTo(Greeting.MORNING)
-        assertThat(state.recentProjects).isEmpty()
-        assertThat(state.recentVideos).isEmpty()
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertThat(state.greeting).isEqualTo(Greeting.MORNING)
+            assertThat(state.recentProjects.map { it.name }).containsExactly("Nuevo", "Viejo").inOrder()
+            assertThat(state.recentVideos).isEmpty()
+        }
     }
 }
