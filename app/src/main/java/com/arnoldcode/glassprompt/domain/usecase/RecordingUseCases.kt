@@ -9,6 +9,7 @@ import com.arnoldcode.glassprompt.domain.model.TeleprompterSettings
 import com.arnoldcode.glassprompt.domain.repository.MediaStorage
 import com.arnoldcode.glassprompt.domain.repository.ProjectRepository
 import com.arnoldcode.glassprompt.domain.repository.TakeRepository
+import com.arnoldcode.glassprompt.domain.repository.VideoThumbnails
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -61,8 +62,10 @@ class ObserveProjectTakesUseCase @Inject constructor(
 
 class DeleteTakeUseCase @Inject constructor(
     private val takes: TakeRepository,
+    private val thumbnails: VideoThumbnails,
 ) {
-    suspend operator fun invoke(id: String): AppResult<Unit> = takes.deleteTake(id)
+    suspend operator fun invoke(id: String): AppResult<Unit> =
+        takes.deleteTake(id).also { if (it is AppResult.Success) thumbnails.delete(takeThumbnailKey(id)) }
 }
 
 /** Persists teleprompter tweaks made while rehearsing or recording (speed, size, mirror…). */

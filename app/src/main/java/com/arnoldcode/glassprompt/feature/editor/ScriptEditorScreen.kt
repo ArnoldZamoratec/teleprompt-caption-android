@@ -65,6 +65,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalClipboard
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -434,6 +435,25 @@ private fun ScriptField(
     GlassPanel(modifier.fillMaxWidth(), contentPadding = PaddingValues(0.dp)) {
         BoxWithConstraints(Modifier.fillMaxSize()) {
             val viewport = maxHeight
+            val density = LocalDensity.current
+            val viewportPx = with(density) { viewport.toPx() }
+            val paddingPx = with(density) { spacing.md.toPx() }
+            val marginPx = with(density) { CURSOR_MARGIN.toPx() }
+            // Keep the line being edited visible: when the keyboard opens the viewport shrinks, and
+            // the outer scroll does not follow the caret by itself (the field is as tall as the text).
+            LaunchedEffect(field.selection, layout, viewportPx) {
+                val result = layout ?: return@LaunchedEffect
+                if (field.selection.end > result.layoutInput.text.length) return@LaunchedEffect
+                val caret = result.getCursorRect(field.selection.end)
+                val top = caret.top + paddingPx
+                val bottom = caret.bottom + paddingPx
+                val visibleTop = scroll.value.toFloat()
+                val visibleBottom = visibleTop + viewportPx
+                when {
+                    bottom + marginPx > visibleBottom -> scroll.animateScrollTo((bottom + marginPx - viewportPx).toInt().coerceAtLeast(0))
+                    top - marginPx < visibleTop -> scroll.animateScrollTo((top - marginPx).toInt().coerceAtLeast(0))
+                }
+            }
             Box(Modifier.fillMaxSize().verticalScroll(scroll)) {
                 BasicTextField(
                     value = field,
@@ -462,6 +482,9 @@ private fun ScriptField(
         }
     }
 }
+
+/** Space kept around the caret when scrolling it into view. */
+private val CURSOR_MARGIN = 48.dp
 
 @Composable
 private fun StatsRow(stats: ScriptStats, saveStatus: SaveStatus) {

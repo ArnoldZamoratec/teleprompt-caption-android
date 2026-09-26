@@ -19,8 +19,10 @@ import androidx.media3.transformer.ExportException
 import androidx.media3.transformer.ExportResult
 import androidx.media3.transformer.ProgressHolder
 import androidx.media3.transformer.Transformer
+import androidx.media3.transformer.VideoEncoderSettings
 import com.arnoldcode.glassprompt.core.common.DispatcherProvider
 import com.arnoldcode.glassprompt.domain.model.ExportOptions
+import com.arnoldcode.glassprompt.domain.model.VideoBitrates
 import com.arnoldcode.glassprompt.domain.repository.ExportOutput
 import com.arnoldcode.glassprompt.domain.repository.ExportRequest
 import com.arnoldcode.glassprompt.domain.repository.VideoExporter
@@ -64,7 +66,16 @@ class Media3VideoExporter @Inject constructor(
             val transformer = Transformer.Builder(context)
                 .setVideoMimeType(MimeTypes.VIDEO_H264)
                 .setAudioMimeType(MimeTypes.AUDIO_AAC)
-                .setEncoderFactory(DefaultEncoderFactory.Builder(context).setEnableFallback(true).build())
+                .setEncoderFactory(
+                    DefaultEncoderFactory.Builder(context)
+                        .setRequestedVideoEncoderSettings(
+                            VideoEncoderSettings.Builder()
+                                .setBitrate(VideoBitrates.export(minOf(width, height), request.settings.frameRate))
+                                .build(),
+                        )
+                        .setEnableFallback(true)
+                        .build(),
+                )
                 .build()
 
             val poller = launch {

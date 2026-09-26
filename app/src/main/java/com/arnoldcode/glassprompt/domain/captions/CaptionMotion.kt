@@ -26,7 +26,10 @@ object CaptionMotion {
     const val EXIT_MS = 140L
 
     /** The caption on screen at [timeMs] (captions are time-ordered and never overlap). */
-    fun captionAt(captions: List<Caption>, timeMs: Long): Caption? {
+    fun captionAt(captions: List<Caption>, timeMs: Long): Caption? = captions.getOrNull(indexAt(captions, timeMs))
+
+    /** Index of the caption on screen at [timeMs], or -1. O(log n): called on every frame. */
+    fun indexAt(captions: List<Caption>, timeMs: Long): Int {
         var low = 0
         var high = captions.lastIndex
         while (low <= high) {
@@ -35,10 +38,10 @@ object CaptionMotion {
             when {
                 timeMs < caption.startMs -> high = mid - 1
                 timeMs >= caption.endMs -> low = mid + 1
-                else -> return caption
+                else -> return mid
             }
         }
-        return null
+        return -1
     }
 
     /** Index of the word being spoken at [timeMs]: the last one that has started, -1 before the first. */

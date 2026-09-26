@@ -10,13 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +41,17 @@ import com.arnoldcode.glassprompt.core.designsystem.theme.GlassTheme
 import com.arnoldcode.glassprompt.core.common.getOrNull
 import com.arnoldcode.glassprompt.domain.model.Take
 import com.arnoldcode.glassprompt.domain.usecase.GetProjectUseCase
+import com.arnoldcode.glassprompt.core.common.DispatcherProvider
 import com.arnoldcode.glassprompt.domain.usecase.ObserveProjectTakesUseCase
+import com.arnoldcode.glassprompt.domain.usecase.VideoThumbnailUseCase
+import com.arnoldcode.glassprompt.domain.usecase.takeThumbnailKey
+import com.arnoldcode.glassprompt.feature.common.VideoThumbnail
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import com.arnoldcode.glassprompt.feature.common.formatClock
 import com.arnoldcode.glassprompt.feature.common.relativeTimeLabel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,6 +69,8 @@ data class TakesUiState(
     val isLoading: Boolean = true,
     val projectName: String = "",
     val takes: List<Take> = emptyList(),
+    /** Poster path per take id, filled in as posters become ready. */
+    val posters: Map<String, String> = emptyMap(),
 )
 
 /** Every recorded take of a project, newest first, so any of them can be captioned or exported later. */
@@ -67,17 +79,36 @@ class TakesViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getProject: GetProjectUseCase,
     observeTakes: ObserveProjectTakesUseCase,
+    private val thumbnail: VideoThumbnailUseCase,
+    dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val projectId: String = checkNotNull(savedStateHandle[ARG_PROJECT_ID]) { "projectId is required" }
 
+    private val posters = MutableStateFlow<Map<String, String>>(emptyMap())
+    private val requested = mutableSetOf<String>()
+
+    private val availableTakes = observeTakes(projectId)
+        // Takes whose file is gone (cleared storage) can't be opened: hide them. Disk checks off main.
+        .map { takes -> takes.filter { File(it.filePath).exists() } }
+        .flowOn(dispatchers.io)
+        .onEach(::requestPosters)
+
     val uiState: StateFlow<TakesUiState> = combine(
         flow { emit(getProject(projectId).getOrNull()?.name.orEmpty()) },
-        observeTakes(projectId),
-    ) { name, takes ->
-        // Takes whose file is gone (cleared storage) can't be opened: hide them.
-        TakesUiState(isLoading = false, projectName = name, takes = takes.filter { File(it.filePath).exists() })
+        availableTakes,
+        posters,
+    ) { name, takes, posters ->
+        TakesUiState(isLoading = false, projectName = name, takes = takes, posters = posters)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TakesUiState())
+
+    private fun requestPosters(takes: List<Take>) {
+        takes.filter { requested.add(it.id) }.forEach { take ->
+            viewModelScope.launch {
+                thumbnail(take.filePath, takeThumbnailKey(take.id))?.let { path -> posters.update { it + (take.id to path) } }
+            }
+        }
+    }
 
     companion object {
         const val ARG_PROJECT_ID = "projectId"
@@ -118,8 +149,9 @@ fun TakesScreen(
                     contentPadding = PaddingValues(spacing.lg),
                     verticalArrangement = Arrangement.spacedBy(spacing.sm),
                 ) {
-                    items(state.takes, key = { it.id }) { take ->
-                        val number = state.takes.size - state.takes.indexOf(take)
+                    // Indexed: numbering must not search the list for every row (that was O(n²)).
+                    itemsIndexed(state.takes, key = { _, take -> take.id }) { index, take ->
+                        val number = state.takes.size - index
                         val title = stringResource(R.string.takes_item_title, number)
                         GlassCard(
                             modifier = Modifier.fillMaxWidth().testTag("take_${take.id}"),
@@ -127,7 +159,10 @@ fun TakesScreen(
                             onClickLabel = title,
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(spacing.sm)) {
-                                Icon(Icons.Outlined.Movie, contentDescription = null, tint = colors.accent)
+                                VideoThumbnail(
+                                    path = state.posters[take.id],
+                                    modifier = Modifier.size(width = 54.dp, height = 96.dp).clip(GlassTheme.shapes.small),
+                                )
                                 Column(Modifier.weight(1f)) {
                                     Text(title, style = MaterialTheme.typography.titleSmall, color = colors.textPrimary)
                                     Text(

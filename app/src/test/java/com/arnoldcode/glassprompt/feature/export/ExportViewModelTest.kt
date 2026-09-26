@@ -16,6 +16,7 @@ import com.arnoldcode.glassprompt.testing.FakeCaptionRepository
 import com.arnoldcode.glassprompt.testing.FakeExportScheduler
 import com.arnoldcode.glassprompt.testing.FakeTakeRepository
 import com.arnoldcode.glassprompt.testing.MainDispatcherRule
+import com.arnoldcode.glassprompt.testing.TestDispatcherProvider
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -47,6 +48,7 @@ class ExportViewModelTest {
         ObserveTakeUseCase(takes),
         ObserveCaptionTrackUseCase(captions),
         ExportControlUseCase(scheduler),
+        TestDispatcherProvider(mainDispatcherRule.dispatcher),
     )
 
     @Test

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arnoldcode.glassprompt.core.common.DispatcherProvider
 import com.arnoldcode.glassprompt.domain.model.ExportOptions
 import com.arnoldcode.glassprompt.domain.model.ExportSettings
 import com.arnoldcode.glassprompt.domain.model.ExportState
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
@@ -32,6 +34,8 @@ data class ExportUiState(
     val settings: ExportSettings? = null,
     val outputSize: Pair<Int, Int>? = null,
     val estimatedBytes: Long = 0,
+    /** Size of the take's file: an export that changes nothing is a copy of exactly this size. */
+    val takeBytes: Long = 0,
     val export: ExportState = ExportState.Idle,
     /** Set once when the export finishes; the screen navigates to the result and consumes it. */
     val finishedExportId: String? = null,
@@ -49,6 +53,7 @@ class ExportViewModel @Inject constructor(
     private val observeTake: ObserveTakeUseCase,
     private val observeTrack: ObserveCaptionTrackUseCase,
     private val control: ExportControlUseCase,
+    private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
     private val takeId: String = checkNotNull(savedStateHandle[ARG_TAKE_ID]) { "takeId is required" }
@@ -71,6 +76,7 @@ class ExportViewModel @Inject constructor(
                     resolutions = ExportOptions.resolutions(take),
                     frameRates = ExportOptions.frameRates(take),
                     hasCaptions = hasCaptions,
+                    takeBytes = withContext(dispatchers.io) { File(take.filePath).length() },
                 ).withSettings(ExportOptions.defaults(take, hasCaptions))
             }
         }
@@ -121,11 +127,13 @@ class ExportViewModel @Inject constructor(
     private fun ExportUiState.withSettings(settings: ExportSettings): ExportUiState {
         val take = take ?: return this
         val size = ExportOptions.outputSize(take.width, take.height, settings.resolution)
-        return copy(
-            settings = settings,
-            outputSize = size,
-            estimatedBytes = ExportOptions.estimateBytes(size.first, size.second, minOf(settings.frameRate, take.frameRate), take.durationMs),
-        )
+        val burnsCaptions = settings.burnCaptions && hasCaptions
+        val estimate = if (ExportOptions.isPassthrough(take, settings, burnsCaptions)) {
+            takeBytes
+        } else {
+            ExportOptions.estimateBytes(size.first, size.second, minOf(settings.frameRate, take.frameRate), take.durationMs)
+        }
+        return copy(settings = settings, outputSize = size, estimatedBytes = estimate)
     }
 
     companion object {

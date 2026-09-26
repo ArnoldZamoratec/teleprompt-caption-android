@@ -57,3 +57,10 @@ interface SubtitleFiles {
     /** Path of a fresh .srt in a shareable cache folder; fails with EmptyContent without captions. */
     suspend fun writeSrt(takeId: String, baseName: String): AppResult<String>
 }
+
+/** Poster images for videos, generated once and cached on disk. */
+interface VideoThumbnails {
+    /** Path of a JPEG poster for [videoPath], made on first request; null if the video can't be read. */
+    suspend fun thumbnail(videoPath: String, key: String): String?
+    fun delete(key: String)
+}

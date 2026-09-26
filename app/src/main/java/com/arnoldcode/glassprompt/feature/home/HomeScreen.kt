@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.arnoldcode.glassprompt.R
+import com.arnoldcode.glassprompt.feature.common.VideoThumbnail
 import com.arnoldcode.glassprompt.core.designsystem.component.GlassCard
 import com.arnoldcode.glassprompt.core.designsystem.component.GlassEmptyState
 import com.arnoldcode.glassprompt.core.designsystem.component.GlassIconButton
@@ -272,16 +273,13 @@ private fun RecentVideosSection(videos: List<VideoSummaryUi>, onOpenVideo: (Stri
             ) {
                 items(videos, key = { it.id }) { video ->
                     GlassCard(modifier = Modifier.width(160.dp), onClick = { onOpenVideo(video.id) }, onClickLabel = video.title) {
-                        Box(
-                            Modifier
+                        VideoThumbnail(
+                            path = video.thumbnailPath,
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .height(200.dp)
-                                .clip(GlassTheme.shapes.medium)
-                                .background(GlassTheme.colors.glassFillStrong),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(Icons.Outlined.Movie, contentDescription = null, tint = GlassTheme.colors.textTertiary)
-                        }
+                                .clip(GlassTheme.shapes.medium),
+                        )
                         Spacer(Modifier.height(GlassTheme.spacing.xs))
                         Text(video.title, style = MaterialTheme.typography.titleSmall, color = GlassTheme.colors.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Text(video.durationLabel, style = MaterialTheme.typography.bodySmall, color = GlassTheme.colors.textSecondary)

@@ -86,18 +86,55 @@ object ExportOptions {
         return even((sourceWidth * scale).roundToInt()) to even((sourceHeight * scale).roundToInt())
     }
 
-    /** Rough H.264 + AAC size, to warn before running out of space. */
+    /** Size of a re-encoded export (H.264 at [VideoBitrates.export] + AAC), to warn before running out of space. */
     fun estimateBytes(width: Int, height: Int, frameRate: Int, durationMs: Long): Long {
-        val videoBitsPerSecond = width.toLong() * height * frameRate * BITS_PER_PIXEL
-        val bitsPerSecond = videoBitsPerSecond + AUDIO_BITS_PER_SECOND
-        return (bitsPerSecond * durationMs / 1000 / 8).toLong()
+        val bitsPerSecond = VideoBitrates.export(min(width, height), frameRate).toLong() + VideoBitrates.AUDIO
+        return bitsPerSecond * durationMs / 1000 / 8
     }
 
-    private fun even(value: Int) = max(2, value - value % 2)
+    /**
+     * True when the export changes nothing (same size and rate, no captions): Media3 then copies
+     * the streams instead of re-encoding, so the result is exactly as big as the take.
+     */
+    fun isPassthrough(take: Take, settings: ExportSettings, burnsCaptions: Boolean): Boolean =
+        !burnsCaptions &&
+            settings.frameRate >= take.frameRate &&
+            settings.resolution.height >= min(take.width, take.height)
 
-    /** Typical H.264 quality for phone video. */
-    private const val BITS_PER_PIXEL = 0.12
-    private const val AUDIO_BITS_PER_SECOND = 128_000.0
+    private fun even(value: Int) = max(2, value - value % 2)
+}
+
+/**
+ * H.264 bitrates. Recording keeps headroom for later edits; exports use the rates YouTube
+ * recommends for uploads, which is what social apps re-encode to anyway. Camera defaults on some
+ * phones are ~17 Mbit/s at 1080p30, about 130 MB per minute, for no visible gain.
+ */
+object VideoBitrates {
+
+    const val AUDIO = 128_000
+
+    /** Bits per second for recording at [shortSide] (720, 1080, 2160) and [frameRate]. */
+    fun recording(shortSide: Int, frameRate: Int): Int = scaled(
+        when {
+            shortSide <= 720 -> 6_000_000
+            shortSide <= 1080 -> 10_000_000
+            else -> 35_000_000
+        },
+        frameRate,
+    )
+
+    /** Bits per second for a re-encoded export. */
+    fun export(shortSide: Int, frameRate: Int): Int = scaled(
+        when {
+            shortSide <= 720 -> 5_000_000
+            shortSide <= 1080 -> 8_000_000
+            else -> 35_000_000
+        },
+        frameRate,
+    )
+
+    /** High frame rates need about 1.5× the bits for the same quality. */
+    private fun scaled(base: Int, frameRate: Int): Int = if (frameRate > 30) base * 3 / 2 else base
 }
 
 /**

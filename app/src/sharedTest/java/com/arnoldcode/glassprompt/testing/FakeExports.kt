@@ -12,6 +12,7 @@ import com.arnoldcode.glassprompt.domain.repository.ExportRequest
 import com.arnoldcode.glassprompt.domain.repository.ExportScheduler
 import com.arnoldcode.glassprompt.domain.repository.VideoExporter
 import com.arnoldcode.glassprompt.domain.repository.VideoGallery
+import com.arnoldcode.glassprompt.domain.repository.VideoThumbnails
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -93,5 +94,19 @@ class FakeExportScheduler : ExportScheduler {
 
     override fun clear(takeId: String) {
         cleared += takeId
+    }
+}
+
+class FakeVideoThumbnails : VideoThumbnails {
+    val requested = mutableListOf<String>()
+    val deleted = mutableListOf<String>()
+
+    override suspend fun thumbnail(videoPath: String, key: String): String {
+        requested += key
+        return "/thumbs/$key.jpg"
+    }
+
+    override fun delete(key: String) {
+        deleted += key
     }
 }

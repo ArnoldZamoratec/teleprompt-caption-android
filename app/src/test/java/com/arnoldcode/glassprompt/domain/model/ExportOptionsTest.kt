@@ -44,8 +44,8 @@ class ExportOptionsTest {
     @Test
     fun `size estimate grows with pixels, frames and duration`() {
         val base = ExportOptions.estimateBytes(1080, 1920, 30, 60_000)
-        // ~1080x1920x30x0.12 bit/s ≈ 7.5 Mbit/s + audio → roughly 57 MB per minute.
-        assertThat(base).isIn(com.google.common.collect.Range.closed(50_000_000L, 65_000_000L))
+        // 8 Mbit/s video + 128 kbit/s audio for 60 s ≈ 61 MB.
+        assertThat(base).isEqualTo((8_000_000L + 128_000) * 60 / 8)
         assertThat(ExportOptions.estimateBytes(720, 1280, 30, 60_000)).isLessThan(base)
         assertThat(ExportOptions.estimateBytes(1080, 1920, 60, 60_000)).isGreaterThan(base)
     }
@@ -61,5 +61,27 @@ class ExportOptionsTest {
         val stalled = RemainingTimeEstimator()
         stalled.update(0, 0.5f)
         assertThat(stalled.update(3_000, 0.5f)).isNull()
+    }
+
+    @Test
+    fun `bitrates follow resolution and frame rate, recording above export`() {
+        assertThat(VideoBitrates.recording(1080, 30)).isEqualTo(10_000_000)
+        assertThat(VideoBitrates.recording(1080, 60)).isEqualTo(15_000_000)
+        assertThat(VideoBitrates.recording(720, 30)).isLessThan(VideoBitrates.recording(1080, 30))
+        assertThat(VideoBitrates.recording(2160, 30)).isGreaterThan(VideoBitrates.recording(1080, 60))
+        assertThat(VideoBitrates.export(1080, 30)).isEqualTo(8_000_000)
+        listOf(720, 1080, 2160).forEach { side ->
+            assertThat(VideoBitrates.export(side, 30)).isAtMost(VideoBitrates.recording(side, 30))
+        }
+    }
+
+    @Test
+    fun `an export that changes nothing is a copy`() {
+        val take = take(1080, 1920, fps = 30)
+        val same = ExportSettings(VideoResolution.FHD_1080, 30, burnCaptions = false)
+        assertThat(ExportOptions.isPassthrough(take, same, burnsCaptions = false)).isTrue()
+        assertThat(ExportOptions.isPassthrough(take, same, burnsCaptions = true)).isFalse()
+        assertThat(ExportOptions.isPassthrough(take, same.copy(resolution = VideoResolution.HD_720), false)).isFalse()
+        assertThat(ExportOptions.isPassthrough(take, same.copy(frameRate = 24), false)).isFalse()
     }
 }

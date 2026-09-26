@@ -17,6 +17,7 @@ import com.arnoldcode.glassprompt.domain.repository.MediaStorage
 import com.arnoldcode.glassprompt.domain.repository.TakeRepository
 import com.arnoldcode.glassprompt.domain.repository.VideoExporter
 import com.arnoldcode.glassprompt.domain.repository.VideoGallery
+import com.arnoldcode.glassprompt.domain.repository.VideoThumbnails
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
@@ -97,8 +98,22 @@ class ObserveRecentExportsUseCase @Inject constructor(private val exports: Expor
     operator fun invoke(limit: Int): Flow<List<ExportedVideo>> = exports.observeRecent(limit)
 }
 
-class DeleteExportUseCase @Inject constructor(private val exports: ExportRepository) {
-    suspend operator fun invoke(id: String): AppResult<Unit> = exports.deleteExport(id)
+class DeleteExportUseCase @Inject constructor(
+    private val exports: ExportRepository,
+    private val thumbnails: VideoThumbnails,
+) {
+    suspend operator fun invoke(id: String): AppResult<Unit> =
+        exports.deleteExport(id).also { if (it is AppResult.Success) thumbnails.delete(exportThumbnailKey(id)) }
+}
+
+/** Cache key of an export's poster. */
+fun exportThumbnailKey(exportId: String) = "export_$exportId"
+
+/** Cache key of a take's poster. */
+fun takeThumbnailKey(takeId: String) = "take_$takeId"
+
+class VideoThumbnailUseCase @Inject constructor(private val thumbnails: VideoThumbnails) {
+    suspend operator fun invoke(videoPath: String, key: String): String? = thumbnails.thumbnail(videoPath, key)
 }
 
 /** Copies an export to the gallery once; later calls return the existing copy. */

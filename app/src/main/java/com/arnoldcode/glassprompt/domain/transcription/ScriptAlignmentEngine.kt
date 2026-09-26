@@ -36,41 +36,44 @@ class ScriptAlignmentEngine @Inject constructor() : TranscriptionEngine {
             val weights = tokens.map { it.length + 1.0 }
             val totalWeight = weights.sum()
 
-            // Virtual timeline = speech only, gaps removed.
+            // Virtual timeline = speech only, gaps removed. Words advance monotonically, so the region
+            // cursor only moves forward: O(words + regions) instead of rescanning per word.
+            val regionStarts = DoubleArray(speech.size)
+            var acc = 0.0
+            speech.forEachIndexed { i, region ->
+                regionStarts[i] = acc
+                acc += region.durationMs
+            }
             var cursor = 0.0
+            var regionIndex = 0
             val result = ArrayList<CaptionWord>(tokens.size)
             tokens.forEachIndexed { i, token ->
                 val length = totalSpeech * weights[i] / totalWeight
-                val (start, end) = toReal(cursor, cursor + length, speech)
+                while (regionIndex < speech.lastIndex && cursor >= regionStarts[regionIndex] + speech[regionIndex].durationMs) regionIndex++
+                val (start, end) = toReal(cursor, cursor + length, speech, regionStarts, regionIndex)
                 result += CaptionWord(token, start, end)
                 cursor += length
             }
             return result
         }
 
-        /** Maps a virtual [vStart, vEnd) span to real time, keeping it inside one region. */
-        private fun toReal(vStart: Double, vEnd: Double, regions: List<SpeechRegion>): Pair<Long, Long> {
-            var offset = 0.0
-            for ((index, region) in regions.withIndex()) {
-                val regionEnd = offset + region.durationMs
-                val isLast = index == regions.lastIndex
-                if (vStart < regionEnd || isLast) {
-                    val inThis = minOf(vEnd, regionEnd) - vStart
-                    val inNext = vEnd - regionEnd
-                    return if (inNext > inThis && !isLast) {
-                        // Most of the word is after the pause: it starts the next region, keeping only
-                        // its share there so it can't overlap the word that follows.
-                        val next = regions[index + 1]
-                        next.startMs to (next.startMs + inNext.toLong()).coerceAtMost(next.endMs)
-                    } else {
-                        val start = region.startMs + (vStart - offset).toLong()
-                        start.coerceAtMost(region.endMs) to (region.startMs + (minOf(vEnd, regionEnd) - offset).toLong()).coerceAtMost(region.endMs)
-                    }
-                }
-                offset = regionEnd
+        /** Maps a virtual [vStart, vEnd) span to real time, keeping it inside region [index] or the next one. */
+        private fun toReal(vStart: Double, vEnd: Double, regions: List<SpeechRegion>, starts: DoubleArray, index: Int): Pair<Long, Long> {
+            val region = regions[index]
+            val offset = starts[index]
+            val regionEnd = offset + region.durationMs
+            val isLast = index == regions.lastIndex
+            val inThis = minOf(vEnd, regionEnd) - vStart
+            val inNext = vEnd - regionEnd
+            return if (inNext > inThis && !isLast) {
+                // Most of the word is after the pause: it starts the next region, keeping only
+                // its share there so it can't overlap the word that follows.
+                val next = regions[index + 1]
+                next.startMs to (next.startMs + inNext.toLong()).coerceAtMost(next.endMs)
+            } else {
+                val start = (region.startMs + (vStart - offset).toLong()).coerceAtMost(region.endMs)
+                start to (region.startMs + (minOf(vEnd, regionEnd) - offset).toLong()).coerceAtMost(region.endMs)
             }
-            val last = regions.last()
-            return last.endMs to last.endMs
         }
     }
 }

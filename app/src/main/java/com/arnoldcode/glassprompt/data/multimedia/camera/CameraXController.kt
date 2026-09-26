@@ -29,6 +29,7 @@ import com.arnoldcode.glassprompt.core.camera.BoundCamera
 import com.arnoldcode.glassprompt.core.camera.CameraCapabilities
 import com.arnoldcode.glassprompt.core.camera.CameraController
 import com.arnoldcode.glassprompt.core.camera.RecorderEvent
+import com.arnoldcode.glassprompt.domain.model.VideoBitrates
 import com.arnoldcode.glassprompt.core.common.AppError
 import com.arnoldcode.glassprompt.core.common.AppResult
 import com.arnoldcode.glassprompt.core.common.Logger
@@ -142,6 +143,8 @@ class CameraXController @Inject constructor(
     ) {
         val recorder = Recorder.Builder()
             .setQualitySelector(QualitySelector.from(resolution.quality(), FallbackStrategy.lowerQualityOrHigherThan(Quality.SD)))
+            // The vendor default can be ~17 Mbit/s at 1080p30: cap it at a high-quality, sane rate.
+            .setTargetVideoEncodingBitRate(VideoBitrates.recording(resolution.height, fps))
             .build()
         val capture = VideoCapture.Builder(recorder)
             .setTargetFrameRate(Range(fps, fps))

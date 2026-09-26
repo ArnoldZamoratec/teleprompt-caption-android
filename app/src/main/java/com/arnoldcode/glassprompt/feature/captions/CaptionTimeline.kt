@@ -55,7 +55,7 @@ fun CaptionTimeline(
     val colors = GlassTheme.colors
     val listState = rememberLazyListState()
     val activeIndex by remember(captions) {
-        derivedStateOf { captions.indexOf(CaptionMotion.captionAt(captions, positionMs())) }
+        derivedStateOf { CaptionMotion.indexAt(captions, positionMs()) }
     }
     LaunchedEffect(activeIndex, isPlaying) {
         if (isPlaying && activeIndex >= 0) listState.animateScrollToItem(activeIndex)

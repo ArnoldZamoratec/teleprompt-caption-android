@@ -16,6 +16,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.background
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -82,6 +87,7 @@ fun GlassApp(
                         modifier = Modifier.glassContentSource(),
                     )
                 }
+                if (currentTab != null) StatusBarScrim(Modifier.align(Alignment.TopCenter))
                 if (showBottomBar) {
                     GlassBottomBar(
                         items = navItems,
@@ -94,6 +100,31 @@ fun GlassApp(
             }
         }
     }
+}
+
+/**
+ * Tab screens scroll edge to edge: this fades the background in behind the status bar so the
+ * clock and icons stay readable over scrolled content. Other screens have their own top bar.
+ */
+@Composable
+private fun StatusBarScrim(modifier: Modifier = Modifier) {
+    val background = GlassTheme.colors.background
+    val statusBar = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val fade = GlassTheme.spacing.lg
+    // Solid behind the status bar itself, then a short fade so content doesn't end on a hard edge.
+    val solidFraction = statusBar / (statusBar + fade)
+    Box(
+        modifier
+            .fillMaxWidth()
+            .height(statusBar + fade)
+            .background(
+                Brush.verticalGradient(
+                    0f to background.copy(alpha = 0.96f),
+                    solidFraction to background.copy(alpha = 0.9f),
+                    1f to background.copy(alpha = 0f),
+                ),
+            ),
+    )
 }
 
 @Composable
