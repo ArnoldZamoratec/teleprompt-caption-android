@@ -41,6 +41,7 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.SearchOff
 import androidx.compose.material.icons.outlined.Slideshow
 import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material.icons.outlined.VideoLibrary
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -103,6 +104,7 @@ fun ScriptEditorScreen(
     launchImport: Boolean,
     onBack: () -> Unit,
     onEditProject: () -> Unit,
+    onOpenTakes: () -> Unit,
     onRehearse: () -> Unit,
     onRecord: () -> Unit,
     viewModel: ScriptEditorViewModel = hiltViewModel(),
@@ -167,6 +169,7 @@ fun ScriptEditorScreen(
             onImportAppend = viewModel::onImportAppend,
             onImportDismiss = viewModel::onImportDismiss,
             onEditProject = onEditProject,
+            onOpenTakes = { viewModel.flush(); onOpenTakes() },
             onRehearse = { viewModel.flush(); onRehearse() },
             onRecord = { viewModel.flush(); onRecord() },
             onMessageShown = viewModel::onMessageShown,
@@ -195,6 +198,7 @@ internal data class EditorActions(
     val onImportAppend: () -> Unit = {},
     val onImportDismiss: () -> Unit = {},
     val onEditProject: () -> Unit = {},
+    val onOpenTakes: () -> Unit = {},
     val onRehearse: () -> Unit = {},
     val onRecord: () -> Unit = {},
     val onMessageShown: () -> Unit = {},
@@ -334,6 +338,13 @@ private fun EditorTopBar(state: EditorUiState, actions: EditorActions) {
                     )
                 }
             }
+            GlassIconButton(
+                icon = Icons.Outlined.VideoLibrary,
+                contentDescription = stringResource(R.string.editor_takes),
+                onClick = actions.onOpenTakes,
+                enabled = !state.isLoading && !state.notFound,
+                modifier = Modifier.testTag("editor_takes"),
+            )
             GlassIconButton(
                 icon = Icons.Outlined.Tune,
                 contentDescription = stringResource(R.string.editor_project_settings),

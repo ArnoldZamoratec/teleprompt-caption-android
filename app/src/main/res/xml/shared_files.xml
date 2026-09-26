@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only exports and generated subtitle files can be shared; raw takes stay private. -->
+<paths>
+    <files-path name="exports" path="exports/" />
+    <cache-path name="subtitles" path="subtitles/" />
+</paths>

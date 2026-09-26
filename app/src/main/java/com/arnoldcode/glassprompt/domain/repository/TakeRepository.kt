@@ -20,6 +20,9 @@ interface MediaStorage {
     /** A fresh, not-yet-existing file for a new recording. */
     fun newTakeFile(): String
 
+    /** A fresh, not-yet-existing file for an export. */
+    fun newExportFile(): String
+
     /** Bytes available for new recordings. */
     fun availableBytes(): Long
 

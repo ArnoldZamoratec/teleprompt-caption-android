@@ -18,7 +18,9 @@ import androidx.navigation.toRoute
 import com.arnoldcode.glassprompt.core.designsystem.theme.GlassAnimations
 import com.arnoldcode.glassprompt.feature.camera.CameraScreen
 import com.arnoldcode.glassprompt.feature.captions.CaptionEditorScreen
-import com.arnoldcode.glassprompt.feature.common.ComingSoonScreen
+import com.arnoldcode.glassprompt.feature.export.ExportResultScreen
+import com.arnoldcode.glassprompt.feature.export.ExportScreen
+import com.arnoldcode.glassprompt.feature.takes.TakesScreen
 import com.arnoldcode.glassprompt.feature.editor.ScriptEditorScreen
 import com.arnoldcode.glassprompt.feature.home.HomeScreen
 import com.arnoldcode.glassprompt.feature.onboarding.OnboardingScreen
@@ -87,7 +89,9 @@ fun GlassNavHost(
                 // Setup is replaced by the editor so Back from the editor returns to where the flow began.
                 onCreated = { id ->
                     navController.navigate(Route.ScriptEditor(id, launchImport = route.importScript)) {
-                        popUpTo<Route.ProjectSetup> { inclusive = true }
+                        // By this entry's destination id: popUpTo<Route.ProjectSetup> did not match the
+                        // typed route (it has optional arguments) and left the form below the editor.
+                        popUpTo(entry.destination.id) { inclusive = true }
                     }
                 },
                 onUpdated = navController::popBackStack,
@@ -99,6 +103,7 @@ fun GlassNavHost(
                 launchImport = route.launchImport,
                 onBack = navController::popBackStack,
                 onEditProject = { navController.navigate(Route.ProjectSetup(projectId = route.projectId)) },
+                onOpenTakes = { navController.navigate(Route.Takes(route.projectId)) },
                 onRehearse = { navController.navigate(Route.Teleprompter(route.projectId)) },
                 onRecord = { navController.navigate(Route.Camera(route.projectId)) },
             )
@@ -127,8 +132,36 @@ fun GlassNavHost(
                 onExport = { takeId -> navController.navigate(Route.Export(takeId)) },
             )
         }
-        composable<Route.Export> { ComingSoonScreen(onBack = navController::popBackStack) }
-        composable<Route.ExportResult> { ComingSoonScreen(onBack = navController::popBackStack) }
+        composable<Route.Takes> { entry ->
+            val route = entry.toRoute<Route.Takes>()
+            TakesScreen(
+                onBack = navController::popBackStack,
+                onOpenTake = { takeId -> navController.navigate(Route.VideoReview(takeId)) },
+                onRecord = { navController.navigate(Route.Camera(route.projectId)) },
+            )
+        }
+        composable<Route.Export> {
+            ExportScreen(
+                onBack = navController::popBackStack,
+                // The export screen is replaced by its result, so Back returns to the editor/review.
+                onExported = { exportId ->
+                    navController.navigate(Route.ExportResult(exportId)) {
+                        popUpTo<Route.Export> { inclusive = true }
+                    }
+                },
+            )
+        }
+        composable<Route.ExportResult> {
+            ExportResultScreen(
+                onBack = navController::popBackStack,
+                // Done: back to the project's editor if we came from it, otherwise home.
+                onDone = {
+                    if (!navController.popBackStack<Route.ScriptEditor>(inclusive = false)) {
+                        navController.navigate(Route.Home) { popUpTo<Route.Home> { inclusive = true } }
+                    }
+                },
+            )
+        }
     }
 }
 

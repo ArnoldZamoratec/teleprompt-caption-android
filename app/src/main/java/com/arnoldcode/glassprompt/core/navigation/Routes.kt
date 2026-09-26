@@ -25,6 +25,7 @@ sealed interface Route {
     @Serializable data class Teleprompter(val projectId: String) : Route
     @Serializable data class Camera(val projectId: String) : Route
     @Serializable data class VideoReview(val takeId: String) : Route
+    @Serializable data class Takes(val projectId: String) : Route
     @Serializable data class CaptionEditor(val takeId: String) : Route
     @Serializable data class Export(val takeId: String) : Route
     @Serializable data class ExportResult(val exportId: String) : Route

@@ -2,7 +2,9 @@ package com.arnoldcode.glassprompt.feature.home
 
 import app.cash.turbine.test
 import com.arnoldcode.glassprompt.core.common.TimeProvider
+import com.arnoldcode.glassprompt.domain.usecase.ObserveRecentExportsUseCase
 import com.arnoldcode.glassprompt.domain.usecase.ObserveRecentProjectsUseCase
+import com.arnoldcode.glassprompt.testing.FakeExportRepository
 import com.arnoldcode.glassprompt.testing.FakeProjectRepository
 import com.arnoldcode.glassprompt.testing.MainDispatcherRule
 import com.google.common.truth.Truth.assertThat
@@ -31,7 +33,7 @@ class HomeViewModelTest {
         val repository = FakeProjectRepository()
         repository.seed("Viejo", updatedAt = 1)
         repository.seed("Nuevo", updatedAt = 2)
-        val viewModel = HomeViewModel(TimeProvider { LocalTime.of(9, 30) }, ObserveRecentProjectsUseCase(repository))
+        val viewModel = HomeViewModel(TimeProvider { LocalTime.of(9, 30) }, ObserveRecentProjectsUseCase(repository), ObserveRecentExportsUseCase(FakeExportRepository()))
 
         viewModel.uiState.test {
             val state = expectMostRecentItem()

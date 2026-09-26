@@ -50,6 +50,7 @@ class FakeMediaStorage(var freeBytes: Long = Long.MAX_VALUE) : MediaStorage {
     val deleted = mutableListOf<String>()
 
     override fun newTakeFile(): String = "/takes/take_${++counter}.mp4".also { created += it }
+    override fun newExportFile(): String = "/exports/export_${++counter}.mp4".also { created += it }
     override fun availableBytes(): Long = freeBytes
     override fun delete(path: String): Boolean {
         deleted += path

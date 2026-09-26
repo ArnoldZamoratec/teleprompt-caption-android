@@ -6,11 +6,14 @@ import com.arnoldcode.glassprompt.core.common.TimeProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.arnoldcode.glassprompt.domain.model.ProjectSummary
+import com.arnoldcode.glassprompt.domain.usecase.ObserveRecentExportsUseCase
 import com.arnoldcode.glassprompt.domain.usecase.ObserveRecentProjectsUseCase
+import com.arnoldcode.glassprompt.feature.common.formatClock
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import java.io.File
 import java.time.LocalTime
 import javax.inject.Inject
 
@@ -37,18 +40,29 @@ data class HomeUiState(
     val recentVideos: List<VideoSummaryUi> = emptyList(),
 )
 
-/** Home state: greeting plus recent projects from Room. Recent videos arrive with export (Phase 7). */
+/** Home state: greeting, recent projects and recently exported videos, all from Room. */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     timeProvider: TimeProvider,
     observeRecentProjects: ObserveRecentProjectsUseCase,
+    observeRecentExports: ObserveRecentExportsUseCase,
 ) : ViewModel() {
 
     private val greeting = greetingFor(timeProvider.now())
 
-    val uiState: StateFlow<HomeUiState> = observeRecentProjects(RECENT_LIMIT)
-        .map { HomeUiState(greeting = greeting, recentProjects = it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(greeting))
+    val uiState: StateFlow<HomeUiState> = combine(
+        observeRecentProjects(RECENT_LIMIT),
+        observeRecentExports(RECENT_LIMIT),
+    ) { projects, exports ->
+        HomeUiState(
+            greeting = greeting,
+            recentProjects = projects,
+            // Exports deleted from disk behind our back are not offered.
+            recentVideos = exports.filter { File(it.filePath).exists() }.map { export ->
+                VideoSummaryUi(export.id, export.projectName, formatClock(export.durationMs), thumbnailPath = null)
+            },
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState(greeting))
 
     private companion object {
         const val RECENT_LIMIT = 10

@@ -346,4 +346,56 @@
     <string name="settings_speech_model_unsupported">El reconocimiento sin conexión no admite este idioma: se usará el guion.</string>
     <string name="settings_speech_model_unavailable">Este dispositivo no tiene reconocimiento de voz sin conexión: se usará el guion.</string>
     <string name="settings_speech_model_download">Descargar idioma</string>
+
+    <!-- Takes -->
+    <string name="editor_takes">Tomas grabadas</string>
+    <string name="takes_title">Tomas</string>
+    <string name="takes_item_title">Toma %1$d</string>
+    <string name="takes_item_info">%1$s · %2$s · %3$dp · %4$d fps</string>
+    <string name="takes_empty_title">Aún no hay tomas</string>
+    <string name="takes_empty_body">Graba tu primera toma leyendo el guion con el teleprompter.</string>
+
+    <!-- Export -->
+    <string name="export_title">Exportar video</string>
+    <string name="export_resolution">Resolución</string>
+    <string name="export_frame_rate">Cuadros por segundo</string>
+    <string name="export_fps">%1$d fps</string>
+    <string name="export_captions">Subtítulos en el video</string>
+    <string name="export_captions_body">Se graban en la imagen tal como los ves en el editor.</string>
+    <string name="export_captions_none">Esta toma aún no tiene subtítulos.</string>
+    <string name="export_estimate">%1$d × %2$d · unos %3$s</string>
+    <string name="export_honest_limits">Nunca se exporta con más resolución ni más cuadros por segundo que la grabación original.</string>
+    <string name="export_start">Exportar</string>
+    <string name="export_cancel">Cancelar exportación</string>
+    <string name="export_progress">Exportando… %1$d %%</string>
+    <string name="export_remaining">Quedan unos %1$s</string>
+    <string name="export_estimating">Calculando el tiempo restante…</string>
+    <string name="export_running_body">Puedes salir de la app: te avisaremos cuando esté listo.</string>
+    <string name="export_failed_not_found">No se encontró el video original.</string>
+    <string name="export_failed_storage">No hay espacio suficiente. Libera espacio o elige una resolución menor.</string>
+    <string name="export_failed_encoder">El dispositivo no pudo codificar el video. Prueba con una resolución o fps menores.</string>
+    <string name="export_failed_unknown">No se pudo exportar el video. Inténtalo de nuevo.</string>
+    <string name="export_channel_name">Exportaciones</string>
+    <string name="export_channel_description">Progreso de los videos que se están exportando.</string>
+    <string name="export_notification_title">Exportando tu video</string>
+    <string name="export_notification_done">Tu video está listo</string>
+    <string name="export_notification_failed">No se pudo exportar el video</string>
+
+    <!-- Export result -->
+    <string name="result_title">Video listo</string>
+    <string name="result_info">%1$s · %2$dp · %3$d fps · %4$s</string>
+    <string name="result_share">Compartir</string>
+    <string name="result_save">Guardar en la galería</string>
+    <string name="result_saved_label">Guardado en la galería</string>
+    <string name="result_saved">Guardado en Películas › GlassPrompt</string>
+    <string name="result_srt">Compartir subtítulos (.srt)</string>
+    <string name="result_no_subtitles">Esta toma no tiene subtítulos.</string>
+    <string name="result_done">Listo</string>
+    <string name="result_delete">Eliminar video</string>
+    <string name="result_delete_title">¿Eliminar este video?</string>
+    <string name="result_delete_body">Se borrará de la app. La copia en tu galería, si la guardaste, se conserva.</string>
+    <string name="share_instagram">Instagram</string>
+    <string name="share_tiktok">TikTok</string>
+    <string name="share_youtube">YouTube</string>
+    <string name="share_whatsapp">WhatsApp</string>
 </resources>

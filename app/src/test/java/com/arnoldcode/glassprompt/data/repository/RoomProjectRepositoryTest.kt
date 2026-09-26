@@ -48,8 +48,8 @@ class RoomProjectRepositoryTest {
     private val ids = IdGenerator { "id${++counter}" }
 
     private val storage = FakeMediaStorage()
-    private val projects = RoomProjectRepository(database.projectDao(), database.takeDao(), storage, clock, ids, NoOpLogger)
-    private val takes = RoomTakeRepository(database.takeDao(), storage, clock, ids, NoOpLogger)
+    private val projects = RoomProjectRepository(database.projectDao(), database.takeDao(), database.exportDao(), storage, clock, ids, NoOpLogger)
+    private val takes = RoomTakeRepository(database.takeDao(), database.exportDao(), storage, clock, ids, NoOpLogger)
     private val scripts = RoomScriptRepository(database.projectDao(), clock, NoOpLogger)
 
     @After

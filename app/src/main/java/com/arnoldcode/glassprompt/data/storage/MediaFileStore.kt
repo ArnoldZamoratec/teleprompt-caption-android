@@ -27,7 +27,7 @@ class MediaFileStore @Inject constructor(
 
     override fun newTakeFile(): String = File(takesDir, "take_${ids.newId()}.mp4").absolutePath
 
-    fun newExportFile(): String = File(exportsDir, "glassprompt_${ids.newId()}.mp4").absolutePath
+    override fun newExportFile(): String = File(exportsDir, "glassprompt_${ids.newId()}.mp4").absolutePath
 
     /** Free space including cache the system may clear for us, like the OS itself counts it. */
     override fun availableBytes(): Long = runCatching {

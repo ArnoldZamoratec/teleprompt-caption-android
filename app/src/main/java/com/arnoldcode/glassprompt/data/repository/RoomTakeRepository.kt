@@ -5,6 +5,7 @@ import com.arnoldcode.glassprompt.core.common.AppResult
 import com.arnoldcode.glassprompt.core.common.IdGenerator
 import com.arnoldcode.glassprompt.core.common.Logger
 import com.arnoldcode.glassprompt.core.common.safeCall
+import com.arnoldcode.glassprompt.data.local.dao.ExportDao
 import com.arnoldcode.glassprompt.data.local.dao.TakeDao
 import com.arnoldcode.glassprompt.data.local.entities.TakeEntity
 import com.arnoldcode.glassprompt.data.local.entities.toDomain
@@ -22,6 +23,7 @@ import javax.inject.Singleton
 @Singleton
 class RoomTakeRepository @Inject constructor(
     private val dao: TakeDao,
+    private val exportDao: ExportDao,
     private val storage: MediaStorage,
     private val clock: Clock,
     private val ids: IdGenerator,
@@ -57,8 +59,10 @@ class RoomTakeRepository @Inject constructor(
     override suspend fun deleteTake(id: String): AppResult<Unit> {
         val take = dao.get(id) ?: return AppResult.Failure(AppError.NotFound("take $id"))
         return safeCall(logger, TAG) {
+            val exports = exportDao.filePathsOfTake(id)
             dao.delete(id)
             storage.delete(take.filePath)
+            exports.forEach(storage::delete)
             Unit
         }
     }

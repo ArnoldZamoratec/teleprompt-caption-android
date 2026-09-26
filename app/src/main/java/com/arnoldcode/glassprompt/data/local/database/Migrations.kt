@@ -52,5 +52,25 @@ object Migrations {
         }
     }
 
-    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
+    /** v4: exported videos. */
+    val MIGRATION_3_4 = object : Migration(3, 4) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                """
+                CREATE TABLE IF NOT EXISTS `exports` (
+                    `id` TEXT NOT NULL, `takeId` TEXT NOT NULL, `filePath` TEXT NOT NULL,
+                    `width` INTEGER NOT NULL, `height` INTEGER NOT NULL, `frameRate` INTEGER NOT NULL,
+                    `durationMs` INTEGER NOT NULL, `sizeBytes` INTEGER NOT NULL, `withCaptions` INTEGER NOT NULL,
+                    `galleryUri` TEXT, `createdAt` INTEGER NOT NULL,
+                    PRIMARY KEY(`id`),
+                    FOREIGN KEY(`takeId`) REFERENCES `takes`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                )
+                """.trimIndent(),
+            )
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_exports_takeId` ON `exports` (`takeId`)")
+            db.execSQL("CREATE INDEX IF NOT EXISTS `index_exports_createdAt` ON `exports` (`createdAt`)")
+        }
+    }
+
+    val ALL = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
 }
